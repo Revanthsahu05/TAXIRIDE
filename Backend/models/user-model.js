@@ -30,7 +30,11 @@ const userschema=mongoose.Schema({
     }
 })
 userschema.methods.generateAuthToken=function(){
-    const token= jwt.sign({_id:this._id},process.env.JWT_SECRET)//is token me bas password nahi jana hai isliye select:false kiya tha
+    const token = jwt.sign(
+        { _id: this._id },
+        process.env.JWT_SECRET,
+        { expiresIn: '24h' }
+    )
     return token
 }
 userschema.methods.comparePassword=async function(enteredPassword){

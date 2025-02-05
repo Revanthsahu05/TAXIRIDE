@@ -26,12 +26,15 @@ module.exports.auth = async (req, res, next) => {
 };
 module.exports.authcaptain= async(req,res,next)=>{
    let token=req.cookies.token || req.headers.authorization?.split(" ")[1];
-   if(!req.cookies.token){
+   if(!token){
       return res.status(401).json({message:"unauthorized"})
    }
    try{
     const decoded=jwt.verify(token,process.env.JWT_SECRET)
     const captain=await captainModel.findOne({_id:decoded._id})
+    if(!captain){
+      throw new Error()
+      }
     req.captain=captain
     next()
    }catch(error){

@@ -1,22 +1,37 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import home from "../assets/home.png";
 import { Link } from "react-router-dom";
-
-const UserLogin = () => {
+import { Userdatacontext } from "../context/Usercontext";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+const Userlogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [userdata,setuserdata]=useState({});
-  const submitHandler = (e) => {
+  const [userdata, setuserdata] = useState({});
+  const navigate = useNavigate();
+  const { user, setuser } = useContext(Userdatacontext);
+  const submitHandler = async (e) => {
     e.preventDefault(); //prevent default form submissions
-    setuserdata({
-      email:{email},
-      password:{password}
-    })
-    console.log(userdata)
-   setEmail("");
-   setPassword("")
+    try {
+      setuserdata({
+        email:  email ,
+        password:  password ,
+      });
+      const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`,{email,password});
+      // console.log(response) we gaet first name,lastname id token in the response
+      if(response.status===201){
+        const data=response.data
+        setuser(data.user)
+        localStorage.setItem('token',data.token)
+        navigate('/home')
+      }
+      setEmail("");
+      setPassword("");
+    } catch (err) {
+       console.error("Signup failed:", err.message);
+       alert("Signup failed. Please try again.");
+    }
   };
-
   return (
     <div className="p-7 bg-yellow-100 h-screen flex flex-col justify-between">
       {/* Attach the submitHandler to the form */}
@@ -72,4 +87,4 @@ const UserLogin = () => {
   );
 };
 
-export default UserLogin;
+export default Userlogin;

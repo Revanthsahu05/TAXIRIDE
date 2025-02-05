@@ -6,20 +6,49 @@ import Usersignup from './Pages/Usersignup'
 import Captainsignup from './Pages/Captainsignup'
 import Captainlogin from './Pages/Captainlogin'
 import { Userdatacontext } from './context/Usercontext'
+import Userlogout from './Pages/Userlogout'
+import Start from './Pages/Start'
+import Userprotectwrapper from './Pages/Userprotectwrapper'
+import Captainhome from './Pages/Captainhome'
+import Captainprotectwrapper from './Pages/Captainprotectwrapper'
 const App = () => {
   const ans=useContext(Userdatacontext)
   console.log(ans)
   return (
     <div>
       <Routes>
-        <Route path="/" element={<Home/>}/>
-        <Route path="/login" element={<Userlogin/>}/>
-        <Route path="/Usersignup" element={<Usersignup/>}/>
-        <Route path="/captain-login" element={<Captainlogin/>}/>
-        <Route path="/captain-signup" element={<Captainsignup/>}/>
+        <Route path="/" element={<Start />} />
+        <Route path="/login" element={<Userlogin />} />
+        <Route path="/Usersignup" element={<Usersignup />} />
+        <Route path="/captain-login" element={<Captainlogin />} />
+        <Route path="/captain-signup" element={<Captainsignup />} />
+        <Route
+          path="/home"
+          element={
+            <Userprotectwrapper>
+              <Home />
+            </Userprotectwrapper>
+          }
+        />
+        <Route
+          path="/user/logout"
+          element={
+            <Userprotectwrapper>
+              <Userlogout />
+            </Userprotectwrapper>
+          }
+        />
+        <Route
+          path="/captain-home"
+          element={
+            <Captainprotectwrapper>
+              <Captainhome></Captainhome>
+            </Captainprotectwrapper>
+          }
+        ></Route>
       </Routes>
     </div>
-  )
+  );
 }
 
 export default App

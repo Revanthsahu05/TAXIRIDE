@@ -12,10 +12,9 @@ router.post('/register', [
     body('vechile.color').isLength({ min: 3 }).withMessage('Color must be at least 3 characters long'),
     body('vechile.Plate').isLength({ min: 3 }).withMessage('Plate must be at least 3 characters long'),
     body('vechile.capacity').isInt({ min: 1 }).withMessage('Capacity must be at least 1'),
-    body('vechile.vechiletype').isIn(['car', 'motorcycle', 'auto']).withMessage('Vehicle type must be car, motorcycle, or auto')
+    body('vechile.vechiletype').isIn(['Car', 'Motorcycle', 'Auto']).withMessage('Vehicle type must be car, motorcycle, or auto')
 ], captainController.registerCaptain);
 router.post('/login', captainController.loginCaptain);
 router.get('/profile',authcaptain,captainController.profile)
 router.get('/logout',authcaptain, captainController.logout);
-
 module.exports = router;

@@ -41,14 +41,19 @@ module.exports.userlogin = async (req, res, next) => {
       maxAge: 24*3600000, // 24 hour
     });
 
-    res.status(200).json({ user, token });
+    res.status(201).json({ user, token });
   } catch (error) {
     dbgr("Error in user login:", error.message);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
 module.exports.profile = async (req, res, next) => {
-  res.status(200).json({ user: req.user });
+  try{
+    res.status(200).json({ user: req.user });
+  }
+  catch(err){
+    dbgr("Error in user profile:", err.message);
+  }
 }
 module.exports.logout = async (req, res, next) => {
   try {

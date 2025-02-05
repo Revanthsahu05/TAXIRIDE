@@ -50,7 +50,7 @@ const captainschema=mongoose.Schema({
         },
         vechiletype:{
             type:String,
-            enum:["car","motorcycle","auto"],
+            enum:["Car","Motorcycle","Auto"],
             required:true
         }
     },
@@ -79,4 +79,3 @@ captainschema.statics.hashpassword=async function(password){
 }
 
 module.exports = mongoose.model("Captain", captainschema);
-

@@ -1,34 +1,53 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
-import home from '../assets/home.png'
+import React, { useState } from "react";
+import { Link, useNavigate} from "react-router-dom";
+import home from "../assets/home.png";
+import { Userdatacontext } from "../context/Usercontext";
+import axios from 'axios'
+import { useContext } from "react";
 const Usersignup = () => {
-  const submithandler=(e)=>{
-    e.preventDefault()
-    setuserdata({
-      fullname: {
-        firstname: firstname,
-        lastname: lastname,
-      },
-      email:email,
-      password:password
-    });
-    console.log(userdata);
-    setemail('');
-    setpassword('');
-    setfirstname('');
-    setlastname('');
-  }
+  const navigate = useNavigate();
+  const { user, setuser } = useContext(Userdatacontext);
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
-  const [firstname, setfirstname] = useState("")
-  const [lastname, setlastname] = useState("")
-   const [userdata, setuserdata] = useState({})
+  const [firstname, setfirstname] = useState("");
+  const [lastname, setlastname] = useState("");
+  const [userdata, setuserdata] = useState({});
+  const submithandler = async (e) => {
+   e.preventDefault();
+   try {
+     const newuser = {
+       fullname: {
+         firstname: firstname,
+         lastname: lastname,
+       },
+       email: email,
+       password: password,
+     };
+     const response = await axios.post(
+       `${import.meta.env.VITE_BASE_URL}/users/register`,
+       newuser
+     );
+     if (response.status === 201) {
+       setuser(response.data.user);
+       localStorage.setItem('token',response.data.token)
+       navigate("/home");
+     }
+   } catch (error) {
+     console.error("Signup failed:", error);
+     alert(
+        "Signup failed. Please try again.");
+   }
+   setemail("");
+   setpassword("");
+   setfirstname("");
+   setlastname("");
+ };
   return (
     <div className="p-7 bg-yellow-100 h-screen flex flex-col justify-between">
       {/* Attach the submitHandler to the form */}
       <form
         onSubmit={(e) => {
-          submithandler(e)
+          submithandler(e);
         }}
       >
         <div className="flex justify-between ">
@@ -88,7 +107,7 @@ const Usersignup = () => {
           type="submit"
           className="bg-yellow-300 rounded-md px-2 py-3 mt-4 w-full text-lg font-normal"
         >
-          Login
+          Create Account
         </button>
         <p className="mt-4">
           Already have an Account?{" "}
@@ -104,6 +123,6 @@ const Usersignup = () => {
       </div>
     </div>
   );
-}
+};
 
-export default Usersignup
+export default Usersignup;

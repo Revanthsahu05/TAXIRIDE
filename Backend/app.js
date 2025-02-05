@@ -10,10 +10,15 @@ const captain=require('./routes/captain-routes')
 app.use(cookieparser())
 connectdb()
 const cors = require("cors");
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Allow frontend URL
+    credentials: true, // Allow cookies if needed
+    allowedHeaders: ["Content-Type", "Authorization"], // Explicitly allow `Authorization` header
+  })
+);
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
-
 app.use('/users',users);
 app.use('/captain',captain)
 app.get("/",(req,res)=>{

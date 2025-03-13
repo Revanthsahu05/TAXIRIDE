@@ -14,7 +14,6 @@ const UserProtectWrapper = ({ children }) => {
       navigate("/login");
       return;
     }
-
     const fetchProfile = async () => {
       try {
         const response = await axios.get(
@@ -26,7 +25,6 @@ const UserProtectWrapper = ({ children }) => {
           }
         );
         setuser(response.data.user);
-        console.log(response.data.user)
       } catch (err) {
         console.log("Error fetching user profile:", err);
         localStorage.removeItem("token");
@@ -35,7 +33,6 @@ const UserProtectWrapper = ({ children }) => {
         setIsLoading(false);
       }
     };
-
     fetchProfile();
   }, [navigate, token, setuser]);
 

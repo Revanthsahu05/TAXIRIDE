@@ -13,7 +13,7 @@ import Captainhome from './Pages/Captainhome'
 import Captainprotectwrapper from './Pages/Captainprotectwrapper'
 const App = () => {
   const ans=useContext(Userdatacontext)
-  console.log(ans)
+  // console.log(ans)
   return (
     <div>
       <Routes>

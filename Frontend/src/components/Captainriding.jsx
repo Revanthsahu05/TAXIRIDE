@@ -1,47 +1,30 @@
-import React from 'react'
-import { Link } from 'react-router-dom';
-import Captaindetail from '../components/Captaindetail';
-import Ridepopup from '../components/Ridepopup';
-import gsap from 'gsap';
+import React from "react";
+import { Link } from "react-router-dom";
+import Captaindetail from "./Captaindetail";
+import Finishride from "./Finishride";
+import { useState, useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import { useState,useRef } from 'react';
-import Confirmridepopup from '../components/Confirmridepopup';
-const Captainhome = () => {
-   const [ridepopup, setridepopup] = useState(true)
-   const [confirmridepopup, setconfirmridepopup] = useState(false)
-   const ridepopupref = useRef(null)
-   const cridepopupref=useRef(null)
-    useGSAP(
-      function () {
-        if (ridepopup) {
-          gsap.to(ridepopupref.current, {
-            translateY: 0,
-          });
-        } else {
-          gsap.to(ridepopupref.current, {
-            translateY: "100%",
-          });
-        }
-      },
-      [ridepopup]
-    );
-    useGSAP(
-      function () {
-        if (confirmridepopup) {
-          gsap.to(cridepopupref.current, {
-            translateY: 0,
-          });
-        } else {
-          gsap.to(cridepopupref.current, {
-            translateY: "100%",
-          });
-        }
-      },
-      [confirmridepopup]
-    );
+import gsap from "gsap";
+const Captainriding = () => {
+  const [finishridepanel, setFinishridepanel] = useState(false);
+  const finishridepanelref = useRef(null);
+  useGSAP(
+    function () {
+      if (finishridepanel) {
+        gsap.to(finishridepanelref.current, {
+          translateY: 0,
+        });
+      } else {
+        gsap.to(finishridepanelref.current, {
+          translateY: "100%",
+        });
+      }
+    },
+    [finishridepanel]
+  );
   return (
     <div>
-      <div className="h-screen">
+      <div className="h-screen relative">
         <div className="fixed p-3 top-0 flex items-center justify-between w-full">
           <img
             className="h-10 w-10"
@@ -55,37 +38,38 @@ const Captainhome = () => {
             <i class=" text-lg font-medium ri-logout-box-r-line"></i>
           </Link>
         </div>
-        <div className="h-4/6">
+        <div className="h-4/5 ">
           <img
             className="h-full w-full object-cover"
             src="https://s.wsj.net/public/resources/images/BN-XR452_201802_M_20180228165525.gif"
             alt=""
           />
         </div>
-        <div className="h-2/6 p-4">
-          <Captaindetail />
+        <div className="h-1/5 p-4 bg-blue-100 flex items-center justify-between relative " onClick={()=>{
+          setFinishridepanel(true)
+        }}>
+          <h3 className="p-1 text-center w-[81%] absolute top-0">
+            <i
+              className="ri-arrow-down-wide-line absolute top-0 text-2xl font-semibold opacity-30"
+              onClick={() => {
+                setFinishridepanel(true)
+              }}
+            ></i>
+          </h3>
+          <h4 className="text-xl font-semibold"> 4 KM away</h4>
+          <button className=" text-white bg-green-500  rounded-lg font-semibold p-3 px-10">
+            Complete Ride
+          </button>
         </div>
         <div
-          ref={ridepopupref}
+          ref={finishridepanelref}
           className="translate-y-full fixed w-full bg-white z-10 bottom-0 px-3 py-6"
         >
-          <Ridepopup
-            setridepopup={setridepopup}
-            setconfirmridepopup={setconfirmridepopup}
-          />
-        </div>
-        <div
-          ref={cridepopupref}
-          className="translate-y-full h-screen fixed w-full bg-white z-10 bottom-0 px-3 py-6"
-        >
-          <Confirmridepopup
-            setconfirmridepopup={setconfirmridepopup}
-            setridepopup={setridepopup}
-          />
+          <Finishride setFinishridepanel={setFinishridepanel} />
         </div>
       </div>
     </div>
   );
-}
+};
 
-export default Captainhome
+export default Captainriding;

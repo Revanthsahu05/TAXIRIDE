@@ -30,7 +30,7 @@ const captainschema=mongoose.Schema({
     status:{
         type:String,
         enum:["active","inactive"],
-        default:"inactive"
+        default:"active"
     },
     vechile:{
         color:{
@@ -55,7 +55,7 @@ const captainschema=mongoose.Schema({
         }
     },
     location:{
-        lat:{
+        ltd:{
             type:Number
         },
         lng:{
@@ -78,4 +78,4 @@ captainschema.statics.hashpassword=async function(password){
     return await bcrypt.hash(password,10)
 }
 
-module.exports = mongoose.model("Captain", captainschema);
+module.exports = mongoose.model("captain", captainschema);

@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Userlogout from "./Userlogout";
+import { useContext } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import axios from "axios";
 import { useState, useRef } from "react";
 import "remixicon/fonts/remixicon.css";
 import Locationsearchpanel from "../components/Locationsearchpanel";
@@ -9,6 +11,11 @@ import Vechilepanel from "../components/Vechilepanel";
 import Confirmridpanel from "../components/Confirmridpanel";
 import Lookingfordriver from "../components/Lookingfordriver";
 import Waitingfordriver from "../components/Waitingfordriver";
+import { SocketContext } from "../context/Socketcontext";
+import { Userdatacontext } from "../context/Usercontext";
+import { Socket } from "socket.io-client";
+import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 const Home = () => {
   const [pickup, setpickup] = useState("");
   const [destination, setdestination] = useState("");
@@ -18,12 +25,78 @@ const Home = () => {
   const vechilepanelref = useRef(null);
   const [vechilepanel, setvechilepanel] = useState(false);
   const [overf, setoverf] = useState(false);
-  const [crpanel, setcrpanel] = useState(false)
-  const [vechilef, setvechilef] = useState(false)
-  const crref = useRef(null)
-  const vechilefref = useRef(null)
-  const Waitingfordriverref=useRef(null)
-  const [waitingfordriver, setwaitingfordriver] = useState(false)
+  const [crpanel, setcrpanel] = useState(false);
+  const [vechilef, setvechilef] = useState(false);
+  const crref = useRef(null);
+  const vechilefref = useRef(null);
+  const Waitingfordriverref = useRef(null);
+  const [waitingfordriver, setwaitingfordriver] = useState(false);
+  const [pickupsuggestions, setPickupsuggestions] = useState([]);
+  const [destinationsuggestions, setdestinationsuggestions] = useState([]);
+  const [activefield, setactivefield] = useState(null);
+  const [fare, setfare] = useState({});
+  const [success, setsuccess] = useState(null);
+  const [vechiletype, setvechiletype] = useState(null);
+  const [amt, setamt] = useState(null);
+  const { sendmessage, recievemessage, socket } = useContext(SocketContext);
+  const { user,ridedata,setridedata } = useContext(Userdatacontext);
+  const navigate=useNavigate()
+  useEffect(() => {
+    sendmessage("join", { usertype: "user", userid: user._id });
+  }, [user]);
+  socket.on("rideconfirmed", (ride) => {
+    setridedata(ride);
+    setvechilef(false);
+    setwaitingfordriver(true);
+  });
+  useEffect(() => {
+    socket.on("ridestarted", (ride) => {
+      setwaitingfordriver(false);
+      // console.log(ride);
+      navigate("/riding");
+    });
+    return () => {
+      socket.off("ridestarted"); // Cleanup the socket event listener
+    };
+  }, [navigate, socket]);
+  const handlepickupchange = async (e) => {
+    setpickup(e.target.value);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`,
+        {
+          params: { input: e.target.value },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        setPickupsuggestions(response.data);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  const handledestinationchange = async (e) => {
+    setdestination(e.target.value);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`,
+        {
+          params: { input: e.target.value },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        setdestinationsuggestions(response.data);
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
   const submithandler = (e) => {
     e.preventDefault();
   };
@@ -51,17 +124,20 @@ const Home = () => {
     },
     [panel]
   );
-  useGSAP(function () {
-    if (vechilepanel) {
-      gsap.to(vechilepanelref.current, {
-        translateY: 0,
-      });
-    } else {
-      gsap.to(vechilepanelref.current, {
-        translateY: "100%",
-      });
-    }
-  },[vechilepanel]);
+  useGSAP(
+    function () {
+      if (vechilepanel) {
+        gsap.to(vechilepanelref.current, {
+          translateY: 0,
+        });
+      } else {
+        gsap.to(vechilepanelref.current, {
+          translateY: "100%",
+        });
+      }
+    },
+    [vechilepanel]
+  );
   useGSAP(
     function () {
       if (crpanel) {
@@ -76,34 +152,78 @@ const Home = () => {
     },
     [crpanel]
   );
-   useGSAP(
-     function () {
-       if (vechilef) {
-         gsap.to(vechilefref.current, {
-           translateY: 0,
-         });
-       } else {
-         gsap.to(vechilefref.current, {
-           translateY: "100%",
-         });
-       }
-     },
-     [vechilef]
-   );
-     useGSAP(
-       function () {
-         if (waitingfordriver) {
-           gsap.to(Waitingfordriverref.current, {
-             translateY: 0,
-           });
-         } else {
-           gsap.to(Waitingfordriverref.current, {
-             translateY: "100%",
-           });
-         }
-       },
-       [waitingfordriver]
-     );
+  useGSAP(
+    function () {
+      if (vechilef) {
+        gsap.to(vechilefref.current, {
+          translateY: 0,
+        });
+      } else {
+        gsap.to(vechilefref.current, {
+          translateY: "100%",
+        });
+      }
+    },
+    [vechilef]
+  );
+  useGSAP(
+    function () {
+      if (waitingfordriver) {
+        gsap.to(Waitingfordriverref.current, {
+          translateY: 0,
+        });
+      } else {
+        gsap.to(Waitingfordriverref.current, {
+          translateY: "100%",
+        });
+      }
+    },
+    [waitingfordriver]
+  );
+  async function findtrip() {
+    setvechilepanel(true);
+    setpanel(false);
+    try {
+      const respone = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/ride/fare`,
+        {
+          params: {
+            pickup: pickup,
+            drop: destination,
+          },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      if (respone.status === 200) {
+        setsuccess(true);
+        setfare(respone.data);
+      } else {
+        setsuccess(false);
+        console.log("error in fare calculation");
+      }
+    } catch (error) {
+      setsuccess(false);
+      console.log(error.message);
+    }
+  }
+  async function createride() {
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/ride/create`,
+      {
+        pickup: pickup,
+        drop: destination,
+        vechiletype: vechiletype,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    // console.log(response.data);
+  }
   return (
     <div
       className={`h-screen relative ${
@@ -143,36 +263,40 @@ const Home = () => {
             }}
             className=" absolute right-6 top-6 text-2xl"
           >
-            <i className="ri-arrow-down-wide-fill opacity-35 font-semibold"></i>
+            {/* <i className="ri-arrow-down-wide-fill opacity-35 font-semibold"></i> */}
+            <i className="ri-arrow-down-wide-fill text-2xl text-gray-500 hover:text-indigo-600 animate-bounce transition-all duration-300"></i>
           </h5>
-          <h4 className="text-2xl font-semibold">Find a Trip</h4>
+          {/* <h4 className="text-2xl  font-semibold w-full">Find a Trip</h4> */}
+          <div className="flex justify-center">
+            <h4 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-4 border-b-2 border-b-indigo-600">
+              Find a Trip
+            </h4>
+          </div>
           <form
             onSubmit={(e) => {
               submithandler(e);
             }}
           >
-            <div className="line absolute h-16 w-1 top-[35%] bg-black left-10 rounded-sm"></div>
+            {/* <div className="line absolute h-16 w-1 top-[35%] bg-black left-10 rounded-sm"></div> */}
             <input
               onClick={() => {
                 setpanel(true);
+                setactivefield("pickup");
               }}
               value={pickup}
-              onChange={(e) => {
-                setpickup(e.target.value);
-              }}
-              className="bg-[#eee] px-8 py-2 text-base rounded-lg w-full mt-3"
+              onChange={handlepickupchange}
+              className="bg-[#eee] px-8 py-2 text-base rounded-lg w-full mt-3 font-semibold"
               type="text"
               placeholder="Add a Pick-up location"
             />
             <input
               onClick={() => {
                 setpanel(true);
+                setactivefield("destination");
               }}
               value={destination}
-              onChange={(e) => {
-                setdestination(e.target.value);
-              }}
-              className="bg-[#eee] px-8 py-2 text-base rounded-lg w-full mt-3"
+              onChange={handledestinationchange}
+              className="bg-[#eee] px-8 py-2 text-base rounded-lg w-full mt-3 font-semibold"
               type="text"
               placeholder="Enter your destination"
             />
@@ -184,6 +308,16 @@ const Home = () => {
             setoverf={setoverf}
             setvechilepanel={setvechilepanel}
             setpanel={setpanel}
+            suggestions={
+              activefield === "pickup"
+                ? pickupsuggestions
+                : destinationsuggestions
+            }
+            setpickup={setpickup}
+            setdestination={setdestination}
+            activefield={activefield}
+            findtrip={findtrip}
+            setsuccess={setsuccess}
           />
         </div>
       </div>
@@ -192,23 +326,40 @@ const Home = () => {
         className=" translate-y-full fixed w-full bg-white z-10 bottom-0 px-3 py-6"
       >
         <Vechilepanel
+          setvechiletype={setvechiletype}
           vechilepanel={vechilepanel}
           setvechilepanel={setvechilepanel}
           setcrpanel={setcrpanel}
           setpanel={setpanel}
+          fare={fare}
+          success={success}
+          setsuccess={setsuccess}
+          setamt={setamt}
         ></Vechilepanel>
       </div>
       <div
         ref={crref}
         className=" translate-y-full fixed w-full bg-white z-10 bottom-0 px-3 py-6"
       >
-        <Confirmridpanel setcrpanel={setcrpanel} setvechilef={setvechilef} />
+        <Confirmridpanel
+          pickup={pickup}
+          amt={amt}
+          vechiletype={vechiletype}
+          destination={destination}
+          createride={createride}
+          setcrpanel={setcrpanel}
+          setvechilef={setvechilef}
+        />
       </div>
       <div
         ref={vechilefref}
         className=" translate-y-full fixed w-full bg-white z-10 bottom-0 px-3 py-6"
       >
         <Lookingfordriver
+          vechiletype={vechiletype}
+          pickup={pickup}
+          amt={amt}
+          destination={destination}
           setvechilef={setvechilef}
           setcrpanel={setcrpanel}
         ></Lookingfordriver>
@@ -218,6 +369,7 @@ const Home = () => {
         className=" translate-y-full fixed w-full bg-white z-10 bottom-0 px-3 py-6"
       >
         <Waitingfordriver
+          ridedata={ridedata}
           setwaitingfordriver={setwaitingfordriver}
         ></Waitingfordriver>
       </div>

@@ -4,6 +4,7 @@ const BlacklistToken = require("../models/blacklisttoken-model");
 const { createcaptain } = require("../services/captain-services");
 const dbgr = require("debug")("development:controllers:captain-controller");
 const jwt = require("jsonwebtoken");
+const captainModel = require("../models/captain-model");
 module.exports.registerCaptain = async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -63,6 +64,8 @@ module.exports.loginCaptain = async (req, res, next) => {
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
+    captain.status = "active";
+    await captain.save();
     captain.password = undefined;
     const token = await captain.generateAuthToken();
     res.cookie("token", token, {
@@ -80,6 +83,9 @@ module.exports.logout = async (req, res, next) => {
     if (!token) {
       return res.status(400).json({ message: "No token provided" });
     }
+    const captain = req.captain;
+    captain.status = "inactive";
+    await captain.save();
     res.clearCookie("token");
     await BlacklistToken.create({ token });
     return res.status(200).json({ message: "Logged out successfully" });
@@ -91,6 +97,6 @@ module.exports.profile = async (req, res, next) => {
   try {
     return res.status(200).json({ captain: req.captain });
   } catch (error) {
-    dbgr(error.message)
+    dbgr(error.message);
   }
 };

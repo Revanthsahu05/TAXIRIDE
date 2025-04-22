@@ -19,17 +19,22 @@ const Finishride = (props) => {
             src="https://img.freepik.com/free-photo/close-up-portrait-curly-handsome-european-male_176532-8133.jpg"
             alt="Profile"
           />
-          <h2 className="text-lg font-medium">Harsh Patel</h2>
+          <h2 className="text-lg font-medium">
+            {" "}
+            {props.ride?.user?.fullname?.firstname +
+              " " +
+              props.ride?.user?.fullname?.lastname}
+          </h2>
         </div>
-        <h5 className="text-lg font-semibold">2.2km</h5>
+        <h5 className="text-lg font-semibold">{props.ride?.distance} km</h5>
       </div>
 
       <div className="flex flex-col items-center justify-center gap-3 pt-5">
         <div className="w-full flex items-center mb-3">
           <i className="ri-map-pin-user-fill text-2xl mr-3"></i>
           <div>
-            <h3 className="font-semibold">562/11-A</h3>
-            <p className="text-gray-600">Kankariya Talab, Bengaluru</p>
+            <h3 className="font-semibold">PICK UP</h3>
+            <p className="text-gray-600">{props.ride?.pickup}</p>
           </div>
         </div>
 
@@ -37,14 +42,14 @@ const Finishride = (props) => {
           <div className="w-full flex items-center">
             <i className="ri-map-pin-2-fill text-2xl mr-3"></i>
             <div>
-              <h3 className="font-semibold">562/11-A</h3>
-              <p className="text-gray-600">Kankariya Talab, Bengaluru</p>
+              <h3 className="font-semibold">DESTINATION</h3>
+              <p className="text-gray-600">{props.ride?.drop}</p>
             </div>
           </div>
           <div className="w-full flex items-center">
             <i className="ri-bank-card-fill text-2xl mr-3"></i>
             <div>
-              <h3 className="font-semibold">₹193.40</h3>
+              <h3 className="font-semibold">₹{props.ride?.fare}</h3>
               <p className="text-gray-600">Total Amount</p>
             </div>
           </div>

@@ -5,9 +5,12 @@ import Finishride from "./Finishride";
 import { useState, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { useContext } from "react";
+import { captaindatacontext } from "../context/Captaincontext";
 const Captainriding = () => {
   const [finishridepanel, setFinishridepanel] = useState(false);
   const finishridepanelref = useRef(null);
+  const {ride,setride}=useContext(captaindatacontext)
   useGSAP(
     function () {
       if (finishridepanel) {
@@ -35,7 +38,7 @@ const Captainriding = () => {
             to="/home"
             className="h-10 w-10 bg-white flex items-center justify-center rounded-full"
           >
-            <i class=" text-lg font-medium ri-logout-box-r-line"></i>
+            <i className=" text-lg font-medium ri-logout-box-r-line"></i>
           </Link>
         </div>
         <div className="h-4/5 ">
@@ -45,19 +48,19 @@ const Captainriding = () => {
             alt=""
           />
         </div>
-        <div className="h-1/5 p-4 bg-blue-100 flex items-center justify-between relative " onClick={()=>{
+        <div className="h-1/5 p-4 bg-blue-100 flex items-center justify-center relative " onClick={()=>{
           setFinishridepanel(true)
         }}>
-          <h3 className="p-1 text-center w-[81%] absolute top-0">
-            <i
+          <h3 className="p-1 text-center w-[51%] absolute top-0">
+            {/* <i
               className="ri-arrow-down-wide-line absolute top-0 text-2xl font-semibold opacity-30"
               onClick={() => {
                 setFinishridepanel(true)
               }}
-            ></i>
+            ></i> */}
           </h3>
-          <h4 className="text-xl font-semibold"> 4 KM away</h4>
-          <button className=" text-white bg-green-500  rounded-lg font-semibold p-3 px-10">
+          {/* <h4 className="text-xl font-semibold">distance: {ride?.distance}km</h4> */}
+          <button className=" text-white bg-green-500 w-full rounded-lg font-semibold p-3 px-10">
             Complete Ride
           </button>
         </div>
@@ -65,7 +68,7 @@ const Captainriding = () => {
           ref={finishridepanelref}
           className="translate-y-full fixed w-full bg-white z-10 bottom-0 px-3 py-6"
         >
-          <Finishride setFinishridepanel={setFinishridepanel} />
+          <Finishride ride={ride} setFinishridepanel={setFinishridepanel} />
         </div>
       </div>
     </div>

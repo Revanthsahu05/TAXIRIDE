@@ -21,7 +21,8 @@
     "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
-    "openrouteservice-js": "^0.4.1"
+    "openrouteservice-js": "^0.4.1",
+    "socket.io": "^4.8.1"
   },
   "description": ""
 }

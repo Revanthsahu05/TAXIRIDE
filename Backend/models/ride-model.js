@@ -45,6 +45,9 @@ const rideschema=new mongoose.Schema({
         type:String,
         select:false,
         required:true
+    },
+    distance:{
+        type:Number
     }
 })
 module.exports=mongoose.model('ride',rideschema)

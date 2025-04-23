@@ -3,6 +3,8 @@ const {validationResult}=require('express-validator')
 const mapservice=require('../services/maps-services')
 const {sendmessagetosocketid}=require('../socket')
 const rideModel = require('../models/ride-model')
+const Captain=require('../models/captain-model')
+const captainModel = require('../models/captain-model')
 module.exports.createride=async(req,res,next)=>{
     const errors=validationResult(req);
     if(!errors.isEmpty()){
@@ -73,6 +75,7 @@ module.exports.startride=async(req,res,next)=>{
     const {rideid,otp}=req.query;
     try{
         const ride=await rideservice.startride(rideid,otp,req.captain._id)
+        await Captain.findByIdAndUpdate(req.captain._id, { status: "inactive" });
         sendmessagetosocketid(ride.user.socketId,{
             event:'ridestarted',
             data:ride
@@ -81,4 +84,53 @@ module.exports.startride=async(req,res,next)=>{
     }catch(error){
         return res.status(500).json({message:error.message})
     }
+}
+module.exports.completeride = async (req, res, next) => {
+    const errors=validationResult(req)
+    if(!errors.isEmpty()){
+        return res.status(400).json({errors:errors.array()})
+    }
+  const { rideid } = req.body;
+  try {
+    const ride = await rideservice.completeride(rideid, req.captain._id);
+    if (!ride) return res.status(404).json({ message: "Ride not found" });
+    await Captain.findByIdAndUpdate(req.captain._id, { status: "active" });
+    sendmessagetosocketid(ride.user.socketId, {
+      event: "ridecompleted",
+      data: ride,
+    });
+    return res.status(200).json(ride);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.cancelRide = async (req, res) => {
+  const { rideid } = req.body;
+
+  try {
+    const ride = await rideModel.findByIdAndUpdate(rideid, { status: "cancelled" }, { new: true }).populate("captain").populate('user');
+    await captainModel.findByIdAndUpdate(ride.captain._id,{status:"active"})
+    if (!ride) return res.status(404).json({ message: "Ride not found" });
+
+    sendmessagetosocketid(ride.captain.socketId, {
+      event: "ridecancelled",
+      data: ride,
+    });
+   
+    return res.status(200).json({ message: "Ride cancelled successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports.updatecancel=async(req,res)=>{
+    const errors=validationResult(req)
+    if(!errors.isEmpty()){
+        return res.status(400).json({errors:errors.array()})
+    }
+    const rideid=req.body.rideid
+    await rideModel.findByIdAndUpdate(rideid,{
+        status:'cancelled'
+    })
 }

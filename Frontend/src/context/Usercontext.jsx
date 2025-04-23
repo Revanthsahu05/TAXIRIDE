@@ -1,3 +1,4 @@
+import { coordinates } from '@maptiler/sdk';
 import React, { createContext } from 'react'
 import { useState } from 'react'
 export const Userdatacontext=createContext()
@@ -8,6 +9,10 @@ const Usercontext = ({children}) => {
         fullname:{
             firstname:'',
             lastname:'',
+        },
+        location:{
+          lat:null,
+          lng:null,
         }
     })
   return (

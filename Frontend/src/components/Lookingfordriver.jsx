@@ -50,9 +50,30 @@
 
 // export default Lookingfordriver
 import React, { useEffect, useState } from "react";
-
+import axios from "axios";
+import { useContext } from "react";
+import { Userdatacontext } from "../context/Usercontext";
 const Lookingfordriver = (props) => {
-
+  const {ridedata}=useContext(Userdatacontext)
+   const handleclick = async () => {
+      props.setvechilef(false);
+      props.setcrpanel(true);
+     try {
+       const response = await axios.post(
+         `${import.meta.env.VITE_BASE_URL}/ride/updatecancel`,
+         {
+           rideid: ridedata._id,
+         },
+         {
+           headers: {
+             Authorization: `Bearer ${localStorage.getItem("token")}`,
+           },
+         }
+       );
+     } catch (err) {
+       console.log(err);
+     }
+   };
   const getVehicleImage = (type) => {
     if (type === "car") {
       return "https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,h_538,w_956/v1688398971/assets/29/fbb8b0-75b1-4e2a-8533-3a364e7042fa/original/UberSelect-White.png";
@@ -113,10 +134,7 @@ const Lookingfordriver = (props) => {
         </div>
         {/* Cancel button */}
         <button
-          onClick={() => {
-            props.setvechilef(false);
-            props.setcrpanel(true);
-          }}
+          onClick={handleclick}
           className="mt-6 px-4 py-2 bg-red-500 text-white font-semibold rounded hover:bg-red-600"
         >
           Cancel Ride

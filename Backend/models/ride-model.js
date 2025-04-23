@@ -48,6 +48,11 @@ const rideschema=new mongoose.Schema({
     },
     distance:{
         type:Number
-    }
+    },
+    completedAt: {
+    type: Date,
+    default: null,
+    expires: 60 * 60 * 24 * 30 
+  }
 })
 module.exports=mongoose.model('ride',rideschema)

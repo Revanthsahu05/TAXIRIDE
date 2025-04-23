@@ -1,4 +1,3 @@
-const { throwDeprecation } = require('process');
 const ridemodel=require('../models/ride-model')
 const mapservice=require('./maps-services')
 const crypto=require('crypto')
@@ -78,10 +77,19 @@ module.exports.confirmride=async(rideid,captainid)=>{
    if(!rideid){
     throw new Error("Ride id is required")
    }
-   await ridemodel.findOneAndUpdate({_id:rideid},{
-    status:"accepted",
-    captain:captainid
-   })
+  //  await ridemodel.findOneAndUpdate({_id:rideid},{
+  //   status:"accepted",
+  //   captain:captainid
+  //  })
+   const updated = await ridemodel.findOneAndUpdate(
+     { _id: rideid, status: "pending" }, // Only update if pending
+     { status: "accepted", captain: captainid },
+     { new: true } // Return the updated document
+   );
+
+   if (!updated) {
+     throw new Error("Ride not found or already accepted/cancelled/completed");
+   }
    const ride = await ridemodel
      .findOne({ _id: rideid })
      .populate("user").populate("captain").select("+otp")
@@ -108,5 +116,22 @@ module.exports.startride=async(rideid,otp,captainid)=>{
   await ridemodel.findOneAndUpdate({_id:rideid},{
     status:'accepted',
   })
+  return ride
+}
+module.exports.completeride=async(rideid,captainid)=>{
+  if(!rideid || !captainid){
+    throw new Error("All fields are required")
+  }
+  const ride=await ridemodel.findOne({_id:rideid}).populate('captain').populate('user')
+  if(!ride){
+    throw new Error("ride not found")
+  }
+   await ridemodel.findOneAndUpdate(
+     { _id: rideid },
+     {
+       status: "Completed",
+       completedAt: new Date(),
+     }
+   );
   return ride
 }

@@ -1,6 +1,27 @@
 import React from "react";
-
+import axios from "axios";
+import { useContext } from "react";
+import { Userdatacontext } from "../context/Usercontext";
 const Waitingfordriver = (props) => {
+  const { ridedata } = useContext(Userdatacontext);
+  const handleclick = async () => {
+    props.setwaitingfordriver(false);
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/ride/cancelride`,
+        {
+          rideid: ridedata._id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  };
   const getVehicleImage = (type) => {
     if (type === "Car") {
       return "https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,h_538,w_956/v1688398971/assets/29/fbb8b0-75b1-4e2a-8533-3a364e7042fa/original/UberSelect-White.png";
@@ -71,7 +92,7 @@ const Waitingfordriver = (props) => {
       {/* Cancel Ride Button */}
       <div className="pt-4 flex justify-center">
         <button
-          onClick={() => props.setwaitingfordriver(false)}
+          onClick={handleclick}
           className="bg-red-500 text-white px-6 py-2 rounded-full font-medium hover:bg-red-600 transition"
         >
           Cancel Ride

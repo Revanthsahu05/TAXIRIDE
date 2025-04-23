@@ -30,4 +30,7 @@ router.get(
 );
 router.post("/confirmride",auth.authcaptain,body("rideid").isMongoId().withMessage("invalid ride id"),ridecontroller.confirmride)
 router.get("/startride",auth.authcaptain,query("rideid").isMongoId().withMessage('invalid ride id'),query('otp').isLength({min:6}).withMessage('invalid otp'),ridecontroller.startride)
+router.post("/completeride",auth.authcaptain,body("rideid").isMongoId().withMessage('invalid ride id'),ridecontroller.completeride)
+router.post("/cancelride",auth.auth,body("rideid").isMongoId().withMessage('invalid ride id'),ridecontroller.cancelRide)
+router.post("/updatecancel",auth.auth,body("rideid").isMongoId().withMessage("invalid ride id"),ridecontroller.updatecancel)
 module.exports=router

@@ -1,16 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Captaindetail from "./Captaindetail";
 import Finishride from "./Finishride";
 import { useState, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { useContext } from "react";
 import { captaindatacontext } from "../context/Captaincontext";
+import RidingLivetracking from "./RidingLivetracking";
 const Captainriding = () => {
   const [finishridepanel, setFinishridepanel] = useState(false);
   const finishridepanelref = useRef(null);
-  const {ride,setride}=useContext(captaindatacontext)
+  const {ride,setride,captain}=useContext(captaindatacontext)
   useGSAP(
     function () {
       if (finishridepanel) {
@@ -42,11 +42,12 @@ const Captainriding = () => {
           </Link>
         </div>
         <div className="h-4/5 ">
-          <img
+          {/* <img
             className="h-full w-full object-cover"
             src="https://s.wsj.net/public/resources/images/BN-XR452_201802_M_20180228165525.gif"
             alt=""
-          />
+          /> */}
+          <RidingLivetracking/>
         </div>
         <div className="h-1/5 p-4 bg-blue-100 flex items-center justify-center relative " onClick={()=>{
           setFinishridepanel(true)

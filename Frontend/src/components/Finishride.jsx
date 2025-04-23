@@ -1,6 +1,134 @@
-import React from 'react'
-import { Link } from "react-router-dom";
+// import React from 'react'
+// import { Link } from "react-router-dom";
+// import { captaindatacontext } from '../context/Captaincontext';
+// import { useContext } from 'react';
+// import { useNavigate } from 'react-router-dom';
+// import axios from 'axios';
+// const Finishride = (props) => {
+//   const {ride,captain}=useContext(captaindatacontext)
+//   const navigate=useNavigate()
+//   const onfinish=async()=>{
+//     try{
+//       const token=localStorage.getItem('token')
+//      const response = await axios.post(
+//                `${import.meta.env.VITE_BASE_URL}/ride/confirmride`,
+//                {
+//                  rideid: ride._id,
+//                },
+//                {
+//                  headers: {
+//                    Authorization: `Bearer ${token}`,
+//                  },
+//                }
+//              );
+//              if(response.status===200){
+//                navigate("/captain-home");
+//              }
+//     }
+//     catch(err){
+//       console.log(err)
+//       alert('Retry')
+//     }
+//   }
+//   return (
+//     <div className="p-4">
+//       <h3 className="p-1 text-center w-[81%] absolute top-0">
+//         <i
+//           className="ri-arrow-down-wide-line absolute top-0 text-2xl font-semibold opacity-30"
+//           onClick={() => props.setFinishridepanel(false)}
+//         ></i>
+//       </h3>
+
+//       <h3 className="font-medium text-xl mb-3">Finish Ride</h3>
+
+//       <div className="flex items-center justify-between mb-4">
+//         <div className="flex items-center gap-3">
+//           <img
+//             className="w-12 h-12 rounded-full object-cover"
+//             src="https://img.freepik.com/free-photo/close-up-portrait-curly-handsome-european-male_176532-8133.jpg"
+//             alt="Profile"
+//           />
+//           <h2 className="text-lg font-medium">
+//             {" "}
+//             {props.ride?.user?.fullname?.firstname +
+//               " " +
+//               props.ride?.user?.fullname?.lastname}
+//           </h2>
+//         </div>
+//         <h5 className="text-lg font-semibold">{props.ride?.distance} km</h5>
+//       </div>
+
+//       <div className="flex flex-col items-center justify-center gap-3 pt-5">
+//         <div className="w-full flex items-center mb-3">
+//           <i className="ri-map-pin-user-fill text-2xl mr-3"></i>
+//           <div>
+//             <h3 className="font-semibold">PICK UP</h3>
+//             <p className="text-gray-600">{props.ride?.pickup}</p>
+//           </div>
+//         </div>
+
+//         <div className="w-full flex flex-col gap-5 items-center mb-4">
+//           <div className="w-full flex items-center">
+//             <i className="ri-map-pin-2-fill text-2xl mr-3"></i>
+//             <div>
+//               <h3 className="font-semibold">DESTINATION</h3>
+//               <p className="text-gray-600">{props.ride?.drop}</p>
+//             </div>
+//           </div>
+//           <div className="w-full flex items-center">
+//             <i className="ri-bank-card-fill text-2xl mr-3"></i>
+//             <div>
+//               <h3 className="font-semibold">₹{props.ride?.fare}</h3>
+//               <p className="text-gray-600">Total Amount</p>
+//             </div>
+//           </div>
+//         </div>
+//         <div className="w-full gap-4 flex items-center justify-between mt-7">
+//           <Link
+//             to="/captain-home"
+//             className="w-full text-white flex justify-center bg-green-500 rounded-md font-medium p-2 "
+//           >
+//             Complete ride
+//           </Link>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default Finishride
+import React, { useContext } from "react";
+import { captaindatacontext } from "../context/Captaincontext";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
 const Finishride = (props) => {
+  const { ride, captain } = useContext(captaindatacontext);
+  const navigate = useNavigate();
+
+  const onfinish = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/ride/completeride`,
+        {
+          rideid: ride._id,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        navigate("/captain-home");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Retry");
+    }
+  };
+
   return (
     <div className="p-4">
       <h3 className="p-1 text-center w-[81%] absolute top-0">
@@ -20,7 +148,6 @@ const Finishride = (props) => {
             alt="Profile"
           />
           <h2 className="text-lg font-medium">
-            {" "}
             {props.ride?.user?.fullname?.firstname +
               " " +
               props.ride?.user?.fullname?.lastname}
@@ -54,17 +181,18 @@ const Finishride = (props) => {
             </div>
           </div>
         </div>
+
         <div className="w-full gap-4 flex items-center justify-between mt-7">
-          <Link
-            to="/captain-home"
-            className="w-full text-white flex justify-center bg-green-500 rounded-md font-medium p-2 "
+          <button
+            onClick={onfinish}
+            className="w-full text-white flex justify-center bg-green-500 rounded-md font-medium p-2"
           >
             Complete ride
-          </Link>
+          </button>
         </div>
       </div>
     </div>
   );
-}
+};
 
-export default Finishride
+export default Finishride;

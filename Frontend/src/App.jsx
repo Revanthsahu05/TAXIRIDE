@@ -13,6 +13,9 @@ import Captainhome from './Pages/Captainhome'
 import Captainprotectwrapper from './Pages/Captainprotectwrapper'
 import Riding from './Pages/Riding'
 import Captainriding from './components/Captainriding'
+import RideCompletedPage from './Pages/RideCompletedPage'
+import RideCancelledPage from './Pages/RideCancelledPage.JSX'
+import "./App.css";
 const App = () => {
   const ans=useContext(Userdatacontext)
   // console.log(ans)
@@ -24,7 +27,7 @@ const App = () => {
         <Route path="/Usersignup" element={<Usersignup />} />
         <Route path="/captain-login" element={<Captainlogin />} />
         <Route path="/captain-signup" element={<Captainsignup />} />
-        <Route path='/riding' element={<Riding></Riding>}></Route>
+        <Route path="/riding" element={<Riding></Riding>}></Route>
         <Route
           path="/home"
           element={
@@ -33,6 +36,7 @@ const App = () => {
             </Userprotectwrapper>
           }
         />
+        <Route path="/ride-completed" element={<RideCompletedPage />} />
         <Route
           path="/user/logout"
           element={
@@ -49,9 +53,8 @@ const App = () => {
             </Captainprotectwrapper>
           }
         ></Route>
-        <Route
-        path='/captainriding' element={<Captainriding/>}>
-        </Route>
+        <Route path="/cancelride" element={<RideCancelledPage />}></Route>
+        <Route path="/captainriding" element={<Captainriding />}></Route>
       </Routes>
     </div>
   );

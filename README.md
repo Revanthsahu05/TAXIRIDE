@@ -29,7 +29,6 @@ TAXIRIDE is a real-time ride-sharing platform that connects passengers with driv
 | **Frontend** | React.js, Tailwind CSS, Axios, Mapbox   |
 | **Backend**  | Node.js, Express.js, MongoDB, Socket.io |
 | **Auth**     | JWT, bcrypt                             |
-       |
 
 ---
 

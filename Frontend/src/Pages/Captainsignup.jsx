@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 const Captainsignup = () => {
   const navigate=useNavigate()
-  const { captain, setcaptain } = useContext(captaindatacontext);
+  const { captain, setCaptain } = useContext(captaindatacontext);
   const user = useContext(Userdatacontext);
 
   const [email, setemail] = useState("");
@@ -39,7 +39,7 @@ const Captainsignup = () => {
     const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/register`,captain)
     if(response.status===201){
        const data=response.data
-       setcaptain(data.captain);
+       setCaptain(data.captain);
        localStorage.setItem('token',data.token)
        navigate('/captain-home')
     }

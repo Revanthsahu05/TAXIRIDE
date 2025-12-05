@@ -20,7 +20,7 @@ module.exports.createride=async(req,res,next)=>{
         })
         res.status(200).json(ride);
         const coordinates=await mapservice.getlocation(pickup)
-        const captaininradius=await mapservice.getcaptaininradius(coordinates.lat,coordinates.lon,10,vechiletype)
+        const captaininradius=await mapservice.getcaptaininradius(coordinates.lat,coordinates.lon,100,vechiletype)
         // console.log(vechiletype)
         ride.otp="";
         const rideuser=await rideModel.findById(ride._id).populate('user')//for sending user data to socket
@@ -123,7 +123,6 @@ module.exports.cancelRide = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
-
 module.exports.updatecancel=async(req,res)=>{
     const errors=validationResult(req)
     if(!errors.isEmpty()){
@@ -134,3 +133,19 @@ module.exports.updatecancel=async(req,res)=>{
         status:'cancelled'
     })
 }
+// module.exports.getRideById = async (req, res) => {
+//   try {
+//     const ride = await RideModel.findById(req.params.rideid)
+//       .populate("user")
+//       .populate("captain");
+
+//     if (!ride) {
+//       return res.status(404).json({ message: "Ride not found" });
+//     }
+
+//     res.status(200).json(ride);
+//   } catch (error) {
+//     console.error("Error fetching ride:", error);
+//     res.status(500).json({ message: "Internal Server Error" });
+//   }
+// };

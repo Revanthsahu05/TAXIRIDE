@@ -86,7 +86,6 @@ module.exports.confirmride=async(rideid,captainid)=>{
      { status: "accepted", captain: captainid },
      { new: true } // Return the updated document
    );
-
    if (!updated) {
      throw new Error("Ride not found or already accepted/cancelled/completed");
    }

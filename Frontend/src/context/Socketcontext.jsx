@@ -15,17 +15,17 @@ const SocketProvider = ({ children }) => {
     //   socket.disconnect();
     // };
   }, []);
-   const sendmessage = (eventname, message) => {
-     socket.emit(eventname, message);
-   };
-   const recievemessage=(eventname,callback)=>{
-    socket.on(eventname,callback);
-   }
-   return (
-    <SocketContext.Provider value={{ socket ,sendmessage, recievemessage }}>  
-    {children} 
+  const sendmessage = (eventname, message) => {
+    socket.emit(eventname, message);
+  };
+  const recievemessage = (eventname, callback) => {
+    socket.on(eventname, callback);
+  }
+  return (
+    <SocketContext.Provider value={{ socket, sendmessage, recievemessage }}>
+      {children}
     </SocketContext.Provider>
-   )
+  )
 };
 
 export default SocketProvider;

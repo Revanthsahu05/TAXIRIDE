@@ -28,6 +28,11 @@ router.get(
     .withMessage("invalid drop location"),
   ridecontroller.getfare
 );
+// router.get(
+//   "/:rideid",
+//   auth.auth, // you can allow captain too if needed
+//   ridecontroller.getRideById
+// );
 router.post("/confirmride",auth.authcaptain,body("rideid").isMongoId().withMessage("invalid ride id"),ridecontroller.confirmride)
 router.get("/startride",auth.authcaptain,query("rideid").isMongoId().withMessage('invalid ride id'),query('otp').isLength({min:6}).withMessage('invalid otp'),ridecontroller.startride)
 router.post("/completeride",auth.authcaptain,body("rideid").isMongoId().withMessage('invalid ride id'),ridecontroller.completeride)

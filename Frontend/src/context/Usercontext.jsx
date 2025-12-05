@@ -1,23 +1,22 @@
-import { coordinates } from '@maptiler/sdk';
 import React, { createContext } from 'react'
 import { useState } from 'react'
-export const Userdatacontext=createContext()
-const Usercontext = ({children}) => {
+export const Userdatacontext = createContext()
+const Usercontext = ({ children }) => {
   const [ridedata, setridedata] = useState({});
-    const [user, setuser] = useState({
-        email:'',
-        fullname:{
-            firstname:'',
-            lastname:'',
-        },
-        location:{
-          lat:null,
-          lng:null,
-        }
-    })
+  const [user, setuser] = useState({
+    email: '',
+    fullname: {
+      firstname: '',
+      lastname: '',
+    },
+    location: {
+      lat: null,
+      lng: null,
+    }
+  })
   return (
     <div>
-      <Userdatacontext.Provider value={{user, setuser,ridedata,setridedata}}>
+      <Userdatacontext.Provider value={{ user, setuser, ridedata, setridedata }}>
         {children}
       </Userdatacontext.Provider>
     </div>

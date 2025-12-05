@@ -43,23 +43,51 @@ const Home = () => {
   const { sendmessage, recievemessage, socket } = useContext(SocketContext);
   const { user, ridedata, setridedata } = useContext(Userdatacontext);
   const navigate = useNavigate();
+  // useEffect(() => {
+  //   const savedRideId = localStorage.getItem("rideId");
+  //   if (savedRideId && !ridedata?._id) {
+  //     // Fetch the ride details again from backend if needed
+  //     axios
+  //       .get(`${import.meta.env.VITE_BASE_URL}/ride/${savedRideId}`, {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         },
+  //       })
+  //       .then((res) => {
+  //         if (res.status === 200) {
+  //           setridedata(res.data);
+  //           setwaitingfordriver(true); // or any other UI based on ride state
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.log("Error fetching ride after reload:", err.message);
+  //         localStorage.removeItem("rideId"); // clear invalid rideId
+  //       });
+  //   }
+  // }, []);
   useEffect(() => {
     sendmessage("join", { usertype: "user", userid: user._id });
   }, [user]);
+  // socket.on("rideconfirmed", (ride) => {
+  //   setridedata(ride);
+  //   setvechilef(false);
+  //   setwaitingfordriver(true);
+  // });
   socket.on("rideconfirmed", (ride) => {
     setridedata(ride);
+    // localStorage.setItem("rideId", ride._id); // ✅ store ride ID persistently
     setvechilef(false);
     setwaitingfordriver(true);
   });
- useEffect(() => {
-   const handleRideCompleted = (ride) => {
-     setridedata(ride); // optional if needed
-     navigate("/ride-completed", { state: { ride } }); // send ride data if needed
-   };
+  useEffect(() => {
+    const handleRideCompleted = (ride) => {
+      setridedata(ride); // optional if needed
+      // localStorage.removeItem("rideId");
+      navigate("/ride-completed", { state: { ride } }); // send ride data if needed
+    };
 
-   socket.on("ridecompleted", handleRideCompleted);
- }, []);
-
+    socket.on("ridecompleted", handleRideCompleted);
+  }, []);
   useEffect(() => {
     socket.on("ridestarted", (ride) => {
       setwaitingfordriver(false);
@@ -233,6 +261,7 @@ const Home = () => {
     );
     if (response.status === 200) {
       setridedata(response.data);
+      localStorage.setItem("rideId", response.data._id);
     }
     // console.log(response.data);
   }
@@ -254,7 +283,7 @@ const Home = () => {
           src="https://s.wsj.net/public/resources/images/BN-XR452_201802_M_20180228165525.gif"
           alt=""
         /> */}
-        <Livetracking/>
+        <Livetracking />
       </div>
       <div
         onClick={() => {

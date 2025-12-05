@@ -40,14 +40,14 @@ const Vechilepanel = (props) => {
             onClick={() => {
               props.setcrpanel(true);
               // props.createride('car')
-              props.setvechiletype('car')
-              props.setamt(props.fare.car)
+              props.setvechiletype("car");
+              props.setamt(props.fare.car);
             }}
             className="flex border-2 active:border-black rounded-lg w-full p-3 mb-3 items-center justify-between cursor-pointer"
           >
             <img
               className="h-12"
-              src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,h_538,w_956/v1688398971/assets/29/fbb8b0-75b1-4e2a-8533-3a364e7042fa/original/UberSelect-White.png"
+              src="https://mobile-content.uber.com/launch-experience/top_bar_rides_3d.png"
               alt="Taxi"
             />
             <div className="mx-4">
@@ -69,7 +69,7 @@ const Vechilepanel = (props) => {
             onClick={() => {
               props.setcrpanel(true);
               // props.createride('motorcycle')
-              props.setvechiletype('motorcycle')
+              props.setvechiletype("motorcycle");
               props.setamt(props.fare.motorcycle);
             }}
             className="flex border-2 active:border-black rounded-lg w-full p-3 mb-3 items-center justify-between cursor-pointer"
@@ -97,7 +97,7 @@ const Vechilepanel = (props) => {
             onClick={() => {
               props.setcrpanel(true);
               // props.createride('auto')
-              props.setvechiletype('auto')
+              props.setvechiletype("auto");
               props.setamt(props.fare.auto);
             }}
             className="flex border-2 active:border-black rounded-lg w-full p-3 mb-3 items-center justify-between cursor-pointer"

@@ -93,6 +93,6 @@ module.exports.getcaptaininradius = async (
       },
     },
   });
-  // console.log("captains in radius", captains);
+  console.log("captains in radius", captains);
   return captains;
 };

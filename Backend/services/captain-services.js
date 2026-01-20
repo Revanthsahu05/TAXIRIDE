@@ -9,15 +9,7 @@ module.exports.createcaptain = async ({
   Plate,
   capacity,
 }) => {
-  if (
-    !firstname ||
-    !email ||
-    !password ||
-    !vechiletype ||
-    !color ||
-    !Plate ||
-    !capacity
-  ) {
+  if (!firstname || !email || !password) {
     throw new Error("All fields are required");
   }
   const existscaptain = await captainmodel.findOne({ email });
@@ -39,6 +31,6 @@ module.exports.createcaptain = async ({
     },
   });
   const token = await captain.generateAuthToken();
-  
+
   return { captain, token };
 };

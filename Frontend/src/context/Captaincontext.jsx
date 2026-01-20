@@ -1,9 +1,8 @@
-import React, { createContext, useState } from "react";
-
+import { createContext, useState } from "react";
 export const captaindatacontext = createContext();
 
 const CaptainContext = ({ children }) => {
-  const [ride, setride] = useState({})
+  const [ride, setride] = useState({});
   const [captain, setCaptain] = useState({
     fullname: {
       firstname: "",
@@ -15,7 +14,7 @@ const CaptainContext = ({ children }) => {
     vechile: {
       color: "",
       Plate: "",
-      capacity:"",
+      capacity: "",
       vechiletype: "",
     },
     location: {

@@ -4,31 +4,28 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 const Confirmridepopup = (props) => {
-  const navigate=useNavigate()
-   const [OTP, setOTP] = useState('')
-  const submithandler=async(e)=>{
+  const navigate = useNavigate()
+  const [OTP, setOTP] = useState('')
+  const submithandler = async (e) => {
     e.preventDefault();
-    try{
-       const response=await axios.get(`${import.meta.env.VITE_BASE_URL}/ride/startride`,{
-      headers:{
-        Authorization:`Bearer ${localStorage.getItem('token')}`
-      },
-      params:{
-        rideid:props.ride._id,
-        otp:OTP
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/ride/startride`, {
+        params: {
+          rideid: props.ride._id,
+          otp: OTP
+        }
+      })
+      if (response.status === 200) {
+        props.setconfirmridepopup(false)
+        props.setridepopup(false)
+
+        navigate('/captainriding')
       }
-    })
-    if(response.status===200){
-      props.setconfirmridepopup(false)
-      props.setridepopup(false)
-      // console.log(response.data)
-      navigate('/captainriding')
-    }
-    else{
-      alert('Invalid OTP')
-    }
-    }catch(error){
-      // console.log(error.response.data.message)
+      else {
+        alert('Invalid OTP')
+      }
+    } catch (error) {
+
       alert('Invalid OTP')
     }
   }

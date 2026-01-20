@@ -9,20 +9,19 @@ const Captainlogin = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const [captaindata, setcaptaindata] = useState({});
-  const submitHandler = async(e) => {
+  const submitHandler = async (e) => {
     e.preventDefault(); //prevent default form submissions
     try {
-     const captain=({
+      const captain = ({
         email: email,
         password: password,
       });
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/captain/login`,
-      captain);
-      if(response.status===200){
-        const data=response.data
+        captain);
+      if (response.status === 200) {
+        const data = response.data
         setcaptaindata(data.captain)
-        localStorage.setItem("token",data.token);
         navigate("/captain-home");
       }
       setEmail("");
@@ -68,6 +67,14 @@ const Captainlogin = () => {
           className="bg-yellow-300 rounded-md px-2 py-3 mt-4 w-full text-lg font-normal"
         >
           Login
+        </button>
+        <button
+          type="button"
+          onClick={() => window.location.href = `${import.meta.env.VITE_BASE_URL}/captain/auth/google`}
+          className="bg-white border text-gray-700 rounded-md px-2 py-3 mt-4 w-full text-lg font-normal flex justify-center items-center gap-2"
+        >
+          <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google" className="h-6 w-6" />
+          Continue with Google
         </button>
         <p className="mt-4">
           Want to join our fleet?{" "}

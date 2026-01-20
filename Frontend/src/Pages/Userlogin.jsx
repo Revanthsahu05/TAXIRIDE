@@ -14,22 +14,21 @@ const Userlogin = () => {
     e.preventDefault(); //prevent default form submissions
     try {
       setuserdata({
-        email:  email ,
-        password:  password ,
+        email: email,
+        password: password,
       });
-      const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`,{email,password});
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`, { email, password });
       // console.log(response) we gaet first name,lastname id token in the response
-      if(response.status===201){
-        const data=response.data
+      if (response.status === 201) {
+        const data = response.data
         setuser(data.user)
-        localStorage.setItem('token',data.token)
         navigate('/home')
       }
       setEmail("");
       setPassword("");
     } catch (err) {
-       console.error("Signup failed:", err.message);
-       alert("Signup failed. Please try again.");
+      console.error("Signup failed:", err.message);
+      alert("Signup failed. Please try again.");
     }
   };
   return (
@@ -68,6 +67,14 @@ const Userlogin = () => {
           className="bg-yellow-300 rounded-md px-2 py-3 mt-4 w-full text-lg font-normal"
         >
           Login
+        </button>
+        <button
+          type="button"
+          onClick={() => window.location.href = `${import.meta.env.VITE_BASE_URL}/users/auth/google`}
+          className="bg-white border text-gray-700 rounded-md px-2 py-3 mt-4 w-full text-lg font-normal flex justify-center items-center gap-2"
+        >
+          <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google" className="h-6 w-6" />
+          Continue with Google
         </button>
         <p className="mt-4">
           Don't have an account?{" "}

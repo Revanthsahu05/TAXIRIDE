@@ -1,58 +1,58 @@
-const mongoose= require('mongoose');
-const rideschema=new mongoose.Schema({
-    user:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'user',
-        required:true
+const mongoose = require('mongoose');
+const rideschema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
+        required: true
     },
-    captain:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'captain', 
+    captain: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'captain',
     },
-    pickup:{
-        type:String,
-        required:true
+    pickup: {
+        type: String,
+        required: true
     },
-    drop:{
-        type:String,
-        required:true
+    drop: {
+        type: String,
+        required: true
     },
-    fare:{
-        type:Number,
-        required:true
+    fare: {
+        type: Number,
+        required: true
     },
-    status:{
-        type:String,
-        enum:['pending','accepted','completed','cancelled'],
-        default:'pending'
+    status: {
+        type: String,
+        enum: ['pending', 'accepted', 'completed', 'cancelled'],
+        default: 'pending'
     },
-    duration:{
-        type:Number,
+    duration: {
+        type: Number,
     },
-    distance:{
-        type:Number
+    distance: {
+        type: Number
     },
-    paymentid:{
-        type:String
+    paymentid: {
+        type: String
     },
-    orderid:{
-        type:String
+    orderid: {
+        type: String
     },
-    signature:{
-        type:String
+    signature: {
+        type: String
     },
-    otp:{
-        type:String,
-        select:false,
-        required:true
+    otp: {
+        type: String,
+        select: false,
+        required: true
     },
-    distance:{
-        type:Number
+    distance: {
+        type: Number
     },
     completedAt: {
-    type: Date,
-    default: null,
-    expires: 60 * 60 * 24 * 30 
-  }
+        type: Date,
+        default: null,
+        expires: 60 * 60 * 24 * 30
+    }
 })
-module.exports=mongoose.model('ride',rideschema)
+module.exports = mongoose.model('ride', rideschema)

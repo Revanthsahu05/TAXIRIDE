@@ -6,7 +6,7 @@ import { captaindatacontext } from "../context/Captaincontext";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 const Captainsignup = () => {
-  const navigate=useNavigate()
+  const navigate = useNavigate()
   const { captain, setCaptain } = useContext(captaindatacontext);
   const user = useContext(Userdatacontext);
 
@@ -14,37 +14,31 @@ const Captainsignup = () => {
   const [password, setpassword] = useState("");
   const [firstname, setfirstname] = useState("");
   const [lastname, setlastname] = useState("");
-  const [vechilecolor, setvechilecolor] = useState("");
-  const [vechileplate, setvechileplate] = useState("");
-  const [vechilecapacity, setvechilecapacity] = useState("");
-  const [vechiletype, setvechiletype] = useState("");
 
-  const submithandler = async(e) => {
+
+  const submithandler = async (e) => {
     e.preventDefault();
-    try{
-       const captain = ({
-      fullname: {
-        firstname: firstname,
-        lastname: lastname,
-      },
-      email: email,
-      password: password,
-      vechile: {
-        color: vechilecolor,
-        Plate: vechileplate,
-        capacity: vechilecapacity,
-        vechiletype: vechiletype,
-      },
-    });
-    const response=await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/register`,captain)
-    if(response.status===201){
-       const data=response.data
-       setCaptain(data.captain);
-       localStorage.setItem('token',data.token)
-       navigate('/captain-home')
-    }
-    }catch(err){
-      console.log(err);
+    try {
+      const captain = ({
+        fullname: {
+          firstname: firstname,
+          lastname: lastname,
+        },
+        email: email,
+        password: password,
+
+      });
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/register`, captain)
+      if (response.status === 201 || response.status === 200) {
+        const data = response.data
+        // Do not set captain or token yet.
+        // Navigate to verification page with email
+        navigate('/captain-verification', { state: { email: email } })
+      }
+    } catch (error) {
+      console.error("Signup failed:", error);
+      const message = error.response?.data?.message || "Signup failed. Please try again.";
+      alert(message);
     }
   };
   return (
@@ -100,55 +94,20 @@ const Captainsignup = () => {
           className="bg-[#f1f0f0e3] border-2 border-yellow-200 rounded px-2 py-3 w-full"
         />
 
-        {/* Vehicle-related data form */}
-        <h3 className="text-lg mb-2">Vechile Information</h3>
-        <div className="flex gap-2">
-          <input
-            required
-            type="text"
-            placeholder="Enter Vehicle Color"
-            value={vechilecolor}
-            onChange={(e) => setvechilecolor(e.target.value)}
-            className="bg-[#f1f0f0e3] font-normal border-2 border-yellow-200 rounded px-2 py-3 w-1/2"
-          />
 
-          <input
-            required
-            type="text"
-            placeholder="Enter Vehicle Plate"
-            value={vechileplate}
-            onChange={(e) => setvechileplate(e.target.value)}
-            className="bg-[#f1f0f0e3] font-normal border-2 border-yellow-200 rounded px-2 py-3 w-1/2"
-          />
-        </div>
-        <div className="flex gap-2">
-          <input
-            required
-            type="number"
-            placeholder="Enter Vehicle Capacity"
-            value={vechilecapacity}
-            onChange={(e) => setvechilecapacity(e.target.value)}
-            className="bg-[#f1f0f0e3] font-normal border-2 border-yellow-200 rounded px-2 py-3 w-full"
-          />
-          <select
-            required
-            value={vechiletype}
-            onChange={(e) => setvechiletype(e.target.value)}
-            className="bg-[#f1f0f0e3] font-normal border-2 border-yellow-200 rounded px-2 py-3 w-full"
-          >
-            <option value="" disabled>
-              Select Vehicle Type
-            </option>
-            <option value="Car">Car</option>
-            <option value="Motorcycle">Motorcycle</option>
-            <option value="Auto">Auto</option>
-          </select>
-        </div>
         <button
           type="submit"
           className="bg-yellow-300 rounded-md px-2 py-3 mt-4 w-full text-lg font-normal"
         >
           Sign Up
+        </button>
+        <button
+          type="button"
+          onClick={() => window.location.href = `${import.meta.env.VITE_BASE_URL}/captain/auth/google`}
+          className="bg-white border text-gray-700 rounded-md px-2 py-3 mt-4 w-full text-lg font-normal flex justify-center items-center gap-2"
+        >
+          <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google" className="h-6 w-6" />
+          Continue with Google
         </button>
 
         <p className="mt-4">

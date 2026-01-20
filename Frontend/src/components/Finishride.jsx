@@ -108,16 +108,10 @@ const Finishride = (props) => {
 
   const onfinish = async () => {
     try {
-      const token = localStorage.getItem("token");
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/ride/completeride`,
         {
           rideid: ride._id,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
         }
       );
       if (response.status === 200) {

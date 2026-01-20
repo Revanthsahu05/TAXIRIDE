@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import {Routes,Route} from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import Home from './Pages/Home'
 import Userlogin from './Pages/Userlogin'
 import Usersignup from './Pages/Usersignup'
@@ -15,9 +15,17 @@ import Riding from './Pages/Riding'
 import Captainriding from './components/Captainriding'
 import RideCompletedPage from './Pages/RideCompletedPage'
 import RideCancelledPage from './Pages/RideCancelledPage.JSX'
+import CaptainVehicleInfo from './Pages/CaptainVehicleInfo'
+import UserVerification from './Pages/UserVerification';
+import CaptainVerification from './Pages/CaptainVerification';
+import GoogleCallback from './Pages/GoogleCallback';
 import "./App.css";
+import axios from 'axios';
+
+axios.defaults.withCredentials = true;
+
 const App = () => {
-  const ans=useContext(Userdatacontext)
+  const ans = useContext(Userdatacontext)
   // console.log(ans)
   return (
     <div>
@@ -25,8 +33,17 @@ const App = () => {
         <Route path="/" element={<Start />} />
         <Route path="/login" element={<Userlogin />} />
         <Route path="/Usersignup" element={<Usersignup />} />
+        <Route path="/user-verification" element={<UserVerification />} />
+        <Route path="/google-callback" element={<GoogleCallback />} />
+
         <Route path="/captain-login" element={<Captainlogin />} />
         <Route path="/captain-signup" element={<Captainsignup />} />
+        <Route path="/captain-verification" element={<CaptainVerification />} />
+        <Route path="/captain-vehicle-info" element={
+          <Captainprotectwrapper>
+            <CaptainVehicleInfo />
+          </Captainprotectwrapper>
+        } />
         <Route path="/riding" element={<Riding></Riding>}></Route>
         <Route
           path="/home"

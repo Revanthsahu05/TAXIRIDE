@@ -11,11 +11,6 @@ const Waitingfordriver = (props) => {
         `${import.meta.env.VITE_BASE_URL}/ride/cancelride`,
         {
           rideid: ridedata._id,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
         }
       );
     } catch (err) {
@@ -52,7 +47,7 @@ const Waitingfordriver = (props) => {
             {props.ridedata?.captain?.vechile?.vechiletype}
           </p>
           <p className="text-sm font-medium text-gray-900">
-           OTP: {props.ridedata?.otp}
+            OTP: {props.ridedata?.otp}
           </p>
         </div>
       </div>

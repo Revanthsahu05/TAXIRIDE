@@ -1,15 +1,21 @@
 const dotenv = require("dotenv");
 dotenv.config();
-const express=require('express')
-const cookieparser=require('cookie-parser')
-const app=express()
-const users=require('./routes/user-routes')
-const connectdb=require('./db/db')
+const express = require('express')
+const cookieparser = require('cookie-parser')
+const app = express()
+const users = require('./routes/user-routes')
+const connectdb = require('./db/db')
 const session = require("express-session");
-const captain=require('./routes/captain-routes')
-const maps=require('./routes/maps-routes')
-const ride=require('./routes/ride-routes')
+const passport = require('passport');
+require('./services/passport-google'); // Configure passport strategies
+const captain = require('./routes/captain-routes')
+const maps = require('./routes/maps-routes')
+const ride = require('./routes/ride-routes')
+const initializeCronJobs = require('./services/cron-service');
+
 app.use(cookieparser())
+app.use(passport.initialize());
+initializeCronJobs();
 connectdb()
 const cors = require("cors");
 app.use(
@@ -20,12 +26,12 @@ app.use(
   })
 );
 app.use(express.json())
-app.use(express.urlencoded({extended:true}))
-app.use('/users',users);
-app.use('/captain',captain)
-app.use('/maps',maps)
-app.use('/ride',ride)
-app.get("/",(req,res)=>{
-    res.send("Hello World")
+app.use(express.urlencoded({ extended: true }))
+app.use('/users', users);
+app.use('/captain', captain)
+app.use('/maps', maps)
+app.use('/ride', ride)
+app.get("/", (req, res) => {
+  res.send("Hello World")
 })
-module.exports=app
+module.exports = app

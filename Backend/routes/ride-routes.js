@@ -1,10 +1,10 @@
-const express=require('express')
-const ridecontroller=require('../controllers/ride-controller')
-const router=express.Router()
-const auth=require('../middlewares/auth-middleware')
-const {body,query}=require('express-validator')
+const express = require('express')
+const ridecontroller = require('../controllers/ride-controller')
+const router = express.Router()
+const auth = require('../middlewares/auth-middleware')
+const { body, query } = require('express-validator')
 router.post(
-  "/create",auth.auth,
+  "/create", auth.auth,
   body("pickup")
     .isString()
     .isLength({ min: 3 })
@@ -13,7 +13,7 @@ router.post(
     .isString()
     .isLength({ min: 3 })
     .withMessage("invalid drop location"),
-  body("vechiletype").isString().isIn(["car", "motorcycle", "auto"]).withMessage("invalid vechile type"),ridecontroller.createride
+  body("vechiletype").isString().isIn(["car", "motorcycle", "auto"]).withMessage("invalid vechile type"), ridecontroller.createride
 );
 router.get(
   "/fare",
@@ -28,14 +28,14 @@ router.get(
     .withMessage("invalid drop location"),
   ridecontroller.getfare
 );
-// router.get(
-//   "/:rideid",
-//   auth.auth, // you can allow captain too if needed
-//   ridecontroller.getRideById
-// );
-router.post("/confirmride",auth.authcaptain,body("rideid").isMongoId().withMessage("invalid ride id"),ridecontroller.confirmride)
-router.get("/startride",auth.authcaptain,query("rideid").isMongoId().withMessage('invalid ride id'),query('otp').isLength({min:6}).withMessage('invalid otp'),ridecontroller.startride)
-router.post("/completeride",auth.authcaptain,body("rideid").isMongoId().withMessage('invalid ride id'),ridecontroller.completeride)
-router.post("/cancelride",auth.auth,body("rideid").isMongoId().withMessage('invalid ride id'),ridecontroller.cancelRide)
-router.post("/updatecancel",auth.auth,body("rideid").isMongoId().withMessage("invalid ride id"),ridecontroller.updatecancel)
-module.exports=router
+
+router.post("/confirmride", auth.authcaptain, body("rideid").isMongoId().withMessage("invalid ride id"), ridecontroller.confirmride)
+router.get("/startride", auth.authcaptain, query("rideid").isMongoId().withMessage('invalid ride id'), query('otp').isLength({ min: 6 }).withMessage('invalid otp'), ridecontroller.startride)
+router.post("/completeride", auth.authcaptain, body("rideid").isMongoId().withMessage('invalid ride id'), ridecontroller.completeride)
+router.post("/cancelride", auth.auth, body("rideid").isMongoId().withMessage('invalid ride id'), ridecontroller.cancelRide)
+router.post("/updatecancel", auth.auth, body("rideid").isMongoId().withMessage("invalid ride id"), ridecontroller.updatecancel)
+router.post("/rate-captain", auth.auth, [
+  body("rideid").isMongoId().withMessage("Invalid ride ID"),
+  body("rating").isFloat({ min: 1, max: 5 }).withMessage("Rating must be between 1 and 5")
+], ridecontroller.rateCaptain);
+module.exports = router

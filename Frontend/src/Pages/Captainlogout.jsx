@@ -5,21 +5,14 @@ const Captainlogout = () => {
   const navigate = useNavigate();
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem("token");
       const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}/captain/logout`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        `${import.meta.env.VITE_BASE_URL}/captain/logout`
       );
-        if(response.status===200){
-            localStorage.removeItem("token");
-            navigate('/captain-login')
-        }
+      if (response.status === 200) {
+        navigate('/captain-login')
+      }
     } catch (err) {
-        console.log("Logout failed:", err.message);
+      console.log("Logout failed:", err.message);
     }
   };
   return (

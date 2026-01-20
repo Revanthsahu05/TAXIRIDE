@@ -50,6 +50,21 @@ export default function Livetracking() {
         center: [userLocation.lng, userLocation.lat],
         zoom: zoom,
       });
+
+      map.current.on('styleimagemissing', (e) => {
+        const id = e.id;
+        // Check if this missing image is one we want to load dynamically
+        if (id === 'copyshop') {
+          // Load an image or just suppress if not critical
+          if (!map.current.hasImage(id)) {
+            // Determine if we should load a real image or just a 1x1 transparent pixel
+            // For now, let's just ignore it or create a placeholder to stop the error looping
+            var image = new Image(1, 1);
+            image.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+            if (!map.current.hasImage(id)) map.current.addImage(id, image);
+          }
+        }
+      });
       marker.current = new maptilersdk.Marker({ color: "#FF0000" })
         .setLngLat([userLocation.lng, userLocation.lat])
         .addTo(map.current);

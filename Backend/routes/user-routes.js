@@ -27,6 +27,7 @@ router.post('/login', [
     body('email').isEmail().withMessage('Email is not valid'),
     body('password').isLength({ min: 5 }).withMessage('Password must be atleast 5 characters long')
 ], usercontroller.userlogin);
+router.post("/refresh-token", usercontroller.refreshToken);
 router.get("/profile", auth, usercontroller.profile);
 router.get("/logout", auth, usercontroller.logout);
 module.exports = router

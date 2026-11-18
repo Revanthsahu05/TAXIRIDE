@@ -10,7 +10,7 @@ const Usercontext = ({ children }) => {
       lastname: '',
     },
     location: {
-      lat: null,
+      ltd: null,
       lng: null,
     }
   })

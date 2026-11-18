@@ -1,7 +1,7 @@
 const { validationResult } = require("express-validator");
 const Captain = require("../models/captain-model");
 const PendingCaptain = require("../models/pending-captain-model");
-const BlacklistToken = require("../models/blacklisttoken-model");
+const redis = require("../db/redis");
 const { createcaptain } = require("../services/captain-services");
 const { sendOtpEmail } = require("../services/email-service");
 const dbgr = require("debug")("development:controllers:captain-controller");
@@ -98,14 +98,22 @@ module.exports.verifyOtp = async (req, res, next) => {
     // Remove pending record
     await PendingCaptain.deleteOne({ _id: pendingCaptain._id });
 
-    const token = captain.generateAuthToken();
+    const accessToken = captain.generateAccessToken();
+    const refreshToken = captain.generateRefreshToken();
 
-    res.cookie("token", token, {
+    // Store refresh token in Redis for 7 days
+    await redis.set(`refresh_token:${captain._id}`, refreshToken, { ex: 7 * 24 * 3600 });
+
+    res.cookie("token", accessToken, {
       httpOnly: true,
-      maxAge: 24 * 3600000,
+      maxAge: 15 * 60 * 1000, // 15 mins
+    });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 3600 * 1000, // 7 days
     });
 
-    return res.status(201).json({ captain, token });
+    return res.status(201).json({ captain, token: accessToken, refreshToken });
 
   } catch (error) {
     next(error);
@@ -129,12 +137,23 @@ module.exports.loginCaptain = async (req, res, next) => {
     captain.status = "active";
     await captain.save();
     captain.password = undefined;
-    const token = await captain.generateAuthToken();
-    res.cookie("token", token, {
+
+    const accessToken = captain.generateAccessToken();
+    const refreshToken = captain.generateRefreshToken();
+
+    // Store refresh token in Redis for 7 days
+    await redis.set(`refresh_token:${captain._id}`, refreshToken, { ex: 7 * 24 * 3600 });
+
+    res.cookie("token", accessToken, {
       httpOnly: true,
-      maxAge: 24 * 3600000,
+      maxAge: 15 * 60 * 1000, // 15 mins
     });
-    return res.status(200).json({ captain, token });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 3600 * 1000, // 7 days
+    });
+
+    return res.status(200).json({ captain, token: accessToken, refreshToken });
   } catch (error) {
     next(error);
   }
@@ -142,15 +161,78 @@ module.exports.loginCaptain = async (req, res, next) => {
 module.exports.logout = async (req, res, next) => {
   try {
     const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
-    if (!token) {
-      return res.status(400).json({ message: "No token provided" });
+    if (token) {
+      let remainingTime = 900;
+      try {
+        const decoded = jwt.decode(token);
+        if (decoded && decoded.exp) {
+          const nowInSec = Math.floor(Date.now() / 1000);
+          remainingTime = Math.max(decoded.exp - nowInSec, 1);
+        }
+      } catch (e) {}
+
+      // Blacklist access token in Redis
+      await redis.set(`blacklist:${token}`, "1", { ex: remainingTime });
     }
+
     const captain = req.captain;
-    captain.status = "inactive";
-    await captain.save();
+    if (captain) {
+      captain.status = "inactive";
+      await captain.save();
+      // Remove refresh token from Redis
+      await redis.del(`refresh_token:${captain._id}`);
+    }
+
     res.clearCookie("token");
-    await BlacklistToken.create({ token });
+    res.clearCookie("refreshToken");
     return res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.refreshToken = async (req, res, next) => {
+  try {
+    const refreshToken = req.cookies.refreshToken || req.body.refreshToken;
+    if (!refreshToken) {
+      return res.status(401).json({ message: "Refresh token is required" });
+    }
+
+    const refreshSecret = process.env.JWT_REFRESH_SECRET || (process.env.JWT_SECRET + "_refresh");
+    let decoded;
+    try {
+      decoded = jwt.verify(refreshToken, refreshSecret);
+    } catch (err) {
+      return res.status(401).json({ message: "Invalid or expired refresh token" });
+    }
+
+    // Verify token exists in Redis
+    const savedToken = await redis.get(`refresh_token:${decoded._id}`);
+    if (!savedToken || savedToken !== refreshToken) {
+      return res.status(401).json({ message: "Refresh token revoked or expired" });
+    }
+
+    const captain = await Captain.findById(decoded._id);
+    if (!captain) {
+      return res.status(401).json({ message: "Captain not found" });
+    }
+
+    const newAccessToken = captain.generateAccessToken();
+    const newRefreshToken = captain.generateRefreshToken();
+
+    // Rotate refresh token in Redis for 7 days
+    await redis.set(`refresh_token:${captain._id}`, newRefreshToken, { ex: 7 * 24 * 3600 });
+
+    res.cookie("token", newAccessToken, {
+      httpOnly: true,
+      maxAge: 15 * 60 * 1000,
+    });
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 3600 * 1000,
+    });
+
+    return res.status(200).json({ token: newAccessToken, refreshToken: newRefreshToken });
   } catch (error) {
     next(error);
   }
@@ -208,15 +290,23 @@ module.exports.googleCallback = async (req, res) => {
       await captain.save();
     }
 
-    const token = await captain.generateAuthToken();
+    const accessToken = captain.generateAccessToken();
+    const refreshToken = captain.generateRefreshToken();
 
-    res.cookie("token", token, {
+    await redis.set(`refresh_token:${captain._id}`, refreshToken, { ex: 7 * 24 * 3600 });
+
+    res.cookie("token", accessToken, {
       httpOnly: true,
-      maxAge: 24 * 3600000,
+      maxAge: 15 * 60 * 1000,
+    });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 7 * 24 * 3600 * 1000,
     });
 
     // Redirect to frontend with token
-    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/google-callback?token=${token}&type=captain`);
+    // Redirect to frontend without token (secure handoff via cookie)
+    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/google-callback?status=success&type=captain`);
   } catch (error) {
     console.error("[CAPTAIN-CONTROLLER] Error:", error);
     res.status(500).json({ message: "Internal Server Error" });

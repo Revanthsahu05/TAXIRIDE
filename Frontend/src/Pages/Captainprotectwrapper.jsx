@@ -7,7 +7,6 @@ const CaptainProtectWrapper = ({ children }) => {
   const { captain, setCaptain } = useContext(captaindatacontext);
   const navigate = useNavigate();
   const location = useLocation();
-  const token = localStorage.getItem("token");
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -26,7 +25,6 @@ const CaptainProtectWrapper = ({ children }) => {
           "Error fetching captain profile:",
           err.response?.data || err
         );
-        localStorage.removeItem("token"); // Cleanup just in case
         navigate("/captain-login");
       }
     };

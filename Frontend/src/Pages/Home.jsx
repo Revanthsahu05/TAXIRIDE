@@ -70,7 +70,7 @@ const Home = () => {
       navigate("/riding");
     });
   }, [navigate, socket]);
-
+  
   const handleUserLogout = async () => {
     try {
       await axios.get(`${import.meta.env.VITE_BASE_URL}/users/logout`);
@@ -234,7 +234,6 @@ const Home = () => {
       setridedata(response.data);
       localStorage.setItem("rideId", response.data._id);
     }
-
   }
   const findTripRef = useRef(null);
 

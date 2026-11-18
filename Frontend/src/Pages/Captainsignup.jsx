@@ -31,8 +31,6 @@ const Captainsignup = () => {
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captain/register`, captain)
       if (response.status === 201 || response.status === 200) {
         const data = response.data
-        // Do not set captain or token yet.
-        // Navigate to verification page with email
         navigate('/captain-verification', { state: { email: email } })
       }
     } catch (error) {

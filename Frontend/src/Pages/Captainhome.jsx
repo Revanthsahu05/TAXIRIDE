@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import Livetracking from '../components/Livetracking';
 const Captainhome = () => {
   const [ridepopup, setridepopup] = useState(false)
+  const [location, setLocation] = useState(null)
   const [confirmridepopup, setconfirmridepopup] = useState(false)
   const ridepopupref = useRef(null)
   const cridepopupref = useRef(null)
@@ -21,23 +22,40 @@ const Captainhome = () => {
   const { captain, ride, setride } = useContext(captaindatacontext)
   const navigate = useNavigate();
   useEffect(() => {
-    sendmessage('join', { usertype: 'captain', userid: captain._id })
-    const updatelocation = () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          socket.emit('update-location-captain', {
-            captainid: captain._id,
-            location: {
-              ltd: position.coords.latitude,
-              lng: position.coords.longitude
-            }
-          })
-        })
-      }
+    if (captain && captain._id) {
+      sendmessage('join', { usertype: 'captain', userid: captain._id });
     }
-    const locationinterval = setInterval(updatelocation, 1000)
-    return () => { clearInterval(locationinterval) }
-  })
+  }, [captain]);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      const watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          setLocation({
+            ltd: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 0
+        }
+      );
+      return () => navigator.geolocation.clearWatch(watchId);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (location && captain && captain._id) {
+      socket.emit('update-location-captain', {
+        captainid: captain._id,
+        location: location
+      });
+    }
+  }, [location, captain]);
   useEffect(() => {
     socket.on("new-ride", (data) => {
       setride(data);

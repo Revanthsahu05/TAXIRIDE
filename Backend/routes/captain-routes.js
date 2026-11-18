@@ -30,6 +30,7 @@ router.post('/login', [
     body('email').isEmail().withMessage('Email is not valid'),
     body('password').isLength({ min: 5 }).withMessage('Password must be at least 5 characters long')
 ], captainController.loginCaptain);
+router.post('/refresh-token', captainController.refreshToken);
 
 router.post('/vehicle-info', authcaptain, [
     body('color').isLength({ min: 3 }).withMessage('Color must be at least 3 characters long'),

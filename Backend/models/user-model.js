@@ -29,14 +29,27 @@ const userschema=mongoose.Schema({
         type:String,
     }
 })
-userschema.methods.generateAuthToken=function(){
-    const token = jwt.sign(
-        { _id: this._id },
+userschema.methods.generateAccessToken = function () {
+    return jwt.sign(
+        { _id: this._id, role: 'user' },
         process.env.JWT_SECRET,
-        { expiresIn: '24h' }
-    )
-    return token
-}
+        { expiresIn: '15m' }
+    );
+};
+
+userschema.methods.generateRefreshToken = function () {
+    const refreshSecret = process.env.JWT_REFRESH_SECRET || (process.env.JWT_SECRET + "_refresh");
+    return jwt.sign(
+        { _id: this._id, role: 'user' },
+        refreshSecret,
+        { expiresIn: '7d' }
+    );
+};
+
+userschema.methods.generateAuthToken = function () {
+    // Backward compatibility: alias to generateAccessToken
+    return this.generateAccessToken();
+};
 userschema.methods.comparePassword=async function(enteredPassword){
     return await bcrypt.compare(enteredPassword,this.password)
 }

@@ -76,9 +76,7 @@ passport.use('google-captain', new GoogleStrategy({
                     password: hashedPassword,
                     status: 'active',
                     vechile: {
-                        // Don't set empty strings here as they trigger minlength validation (min 3)
-                        capacity: 1, // Default capacity
-                        vechiletype: 'Car' // Default type
+                        // Leave empty so captain enters details later
                     }
                 });
                 await captain.save();

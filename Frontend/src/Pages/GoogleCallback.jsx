@@ -10,12 +10,11 @@ const GoogleCallback = () => {
     const { setCaptain } = useContext(captaindatacontext);
 
     useEffect(() => {
-        const token = searchParams.get('token');
+        const status = searchParams.get('status');
         const type = searchParams.get('type');
 
-        if (token) {
+        if (status === 'success') {
             // Token is set in cookie by backend, we just handle navigation
-
             if (type === 'user') {
                 navigate('/home');
             } else if (type === 'captain') {

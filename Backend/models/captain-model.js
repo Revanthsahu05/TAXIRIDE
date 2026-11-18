@@ -101,14 +101,27 @@ const captainschema = mongoose.Schema({
         }
     }
 })
-captainschema.methods.generateAuthToken = function () {
-    const token = jwt.sign(
-        { _id: this._id },
+captainschema.methods.generateAccessToken = function () {
+    return jwt.sign(
+        { _id: this._id, role: 'captain' },
         process.env.JWT_SECRET,
-        { expiresIn: '24h' }
-    )
-    return token
-}
+        { expiresIn: '15m' }
+    );
+};
+
+captainschema.methods.generateRefreshToken = function () {
+    const refreshSecret = process.env.JWT_REFRESH_SECRET || (process.env.JWT_SECRET + "_refresh");
+    return jwt.sign(
+        { _id: this._id, role: 'captain' },
+        refreshSecret,
+        { expiresIn: '7d' }
+    );
+};
+
+captainschema.methods.generateAuthToken = function () {
+    // Backward compatibility: alias to generateAccessToken
+    return this.generateAccessToken();
+};
 captainschema.methods.comparePassword = async function (enteredPassword) {
     return await bcrypt.compare(enteredPassword, this.password)
 }

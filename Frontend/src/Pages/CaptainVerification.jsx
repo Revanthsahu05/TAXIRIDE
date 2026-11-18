@@ -30,7 +30,7 @@ const CaptainVerification = () => {
             if (response.status === 201 || response.status === 200) {
                 const data = response.data;
                 setCaptain(data.captain);
-                localStorage.setItem('token', data.token);
+                // localStorage.setItem('token', data.token);
                 navigate('/captain-home');
             }
         } catch (err) {

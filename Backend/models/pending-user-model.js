@@ -29,7 +29,7 @@ const pendingUserSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now,
-        expires: 600 // 10 minutes TTL
+        expires: 600 
     }
 });
 

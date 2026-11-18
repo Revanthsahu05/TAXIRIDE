@@ -1,2 +1,11 @@
-node_modules
+node_modules/
 .env
+.env.*
+*.local
+dist/
+build/
+.vite/
+Frontend/.vite/
+Frontend/dist/
+*.log
+.DS_Store

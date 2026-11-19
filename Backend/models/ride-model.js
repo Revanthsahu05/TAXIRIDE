@@ -54,5 +54,12 @@ const rideschema = new mongoose.Schema({
         default: null,
         expires: 60 * 60 * 24 * 2
     }
-})
-module.exports = mongoose.model('ride', rideschema)
+}, { timestamps: true });
+
+// Compound indexes for ultra-fast active ride lookups and trip history
+rideschema.index({ user: 1, status: 1 });
+rideschema.index({ captain: 1, status: 1 });
+rideschema.index({ status: 1 });
+rideschema.index({ createdAt: -1 });
+
+module.exports = mongoose.model('ride', rideschema);

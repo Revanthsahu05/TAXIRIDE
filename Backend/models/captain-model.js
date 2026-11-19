@@ -126,4 +126,7 @@ captainschema.statics.hashpassword = async function (password) {
     return await bcrypt.hash(password, 10)
 }
 
+// Compound index for high-speed active vehicle filtering
+captainschema.index({ status: 1, "vechile.vechiletype": 1 });
+
 module.exports = mongoose.model("captain", captainschema);

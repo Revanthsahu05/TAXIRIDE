@@ -29,6 +29,9 @@ router.get(
   ridecontroller.getfare
 );
 
+router.get("/active-ride", auth.auth, ridecontroller.getActiveRideUser);
+router.get("/active-ride-captain", auth.authcaptain, ridecontroller.getActiveRideCaptain);
+
 router.post("/confirmride", auth.authcaptain, body("rideid").isMongoId().withMessage("invalid ride id"), ridecontroller.confirmride)
 router.get("/startride", auth.authcaptain, query("rideid").isMongoId().withMessage('invalid ride id'), query('otp').isLength({ min: 6 }).withMessage('invalid otp'), ridecontroller.startride)
 router.post("/completeride", auth.authcaptain, body("rideid").isMongoId().withMessage('invalid ride id'), ridecontroller.completeride)

@@ -112,10 +112,10 @@ module.exports.startride = async (rideid, otp, captainid) => {
   if (ride.status !== 'accepted') {
     throw new Error("Ride already started")
   }
-  await ridemodel.findOneAndUpdate({ _id: rideid }, {
-    status: 'accepted',
-  })
-  return ride
+  const updatedRide = await ridemodel.findOneAndUpdate({ _id: rideid }, {
+    status: 'ongoing',
+  }, { new: true }).populate('captain').populate('user');
+  return updatedRide;
 }
 module.exports.completeride = async (rideid, captainid) => {
   if (!rideid || !captainid) {
@@ -128,7 +128,7 @@ module.exports.completeride = async (rideid, captainid) => {
   await ridemodel.findOneAndUpdate(
     { _id: rideid },
     {
-      status: "Completed",
+      status: "completed",
       completedAt: new Date(),
     }
   );

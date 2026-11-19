@@ -24,9 +24,6 @@ const userschema=mongoose.Schema({
         type:String,
         required:true,
         select:false
-    },
-    socketId:{
-        type:String,
     }
 })
 userschema.methods.generateAccessToken = function () {

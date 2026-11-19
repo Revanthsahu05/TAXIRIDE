@@ -45,15 +45,54 @@ const Home = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    sendmessage("join", { usertype: "user", userid: user._id });
+    if (user && user._id) {
+      sendmessage("join", { usertype: "user", userid: user._id });
+    }
   }, [user]);
 
-  socket.on("rideconfirmed", (ride) => {
-    setridedata(ride);
-    // localStorage.setItem("rideId", ride._id); // ✅ store ride ID persistently
-    setvechilef(false);
-    setwaitingfordriver(true);
-  });
+  // Fetch active ride on page mount/refresh
+  useEffect(() => {
+    const fetchActiveRide = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}/ride/active-ride`,
+          { withCredentials: true }
+        );
+        if (response.data) {
+          const activeRide = response.data;
+          setridedata(activeRide);
+          if (activeRide.status === "pending") {
+            setpickup(activeRide.pickup || "");
+            setdestination(activeRide.drop || "");
+            setamt(activeRide.fare);
+            setvechiletype(activeRide.vechiletype);
+            setvechilef(true);
+          } else if (activeRide.status === "accepted") {
+            setwaitingfordriver(true);
+          } else if (activeRide.status === "ongoing") {
+            navigate("/riding");
+          }
+        }
+      } catch (err) {
+        console.log("No active ride or error:", err.message);
+      }
+    };
+
+    fetchActiveRide();
+  }, []);
+
+  useEffect(() => {
+    const handleRideConfirmed = (ride) => {
+      setridedata(ride);
+      setvechilef(false);
+      setwaitingfordriver(true);
+    };
+
+    socket.on("rideconfirmed", handleRideConfirmed);
+    return () => {
+      socket.off("rideconfirmed", handleRideConfirmed);
+    };
+  }, [socket]);
   useEffect(() => {
     const handleRideCompleted = (ride) => {
       setridedata(ride); // optional if needed

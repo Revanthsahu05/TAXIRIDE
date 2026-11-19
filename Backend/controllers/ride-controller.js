@@ -23,16 +23,14 @@ module.exports.createride = async (req, res, next) => {
         const captaininradius = await mapservice.getcaptaininradius(coordinates.lat, coordinates.lon, 100, vechiletype)
         // console.log(vechiletype)
         ride.otp = "";
-        const rideuser = await rideModel.findById(ride._id).populate('user')//for sending user data to socket
-        captaininradius.map(async captain => {
-            const socketid = captain.socketId
-            if (socketid) {
-                sendmessagetosocketid(socketid, {
-                    event: 'new-ride',
-                    data: rideuser
-                })
-            }
-        })
+        const rideuser = await rideModel.findById(ride._id).populate('user'); // for sending user data to socket
+        captaininradius.forEach((captain) => {
+            const captainId = captain._id || captain;
+            sendmessagetosocketid(captainId, {
+                event: 'new-ride',
+                data: rideuser
+            });
+        });
     } catch (error) {
         return res.status(404).json({ message: 'ride creation error' })
     }
@@ -57,8 +55,9 @@ module.exports.confirmride = async (req, res, next) => {
     }
     const { rideid } = req.body
     try {
-        const ride = await rideservice.confirmride(rideid, req.captain._id)
-        sendmessagetosocketid(ride.user.socketId, {
+        const ride = await rideservice.confirmride(rideid, req.captain._id);
+        const userId = ride.user._id || ride.user;
+        sendmessagetosocketid(userId, {
             event: "rideconfirmed",
             data: ride,
         });
@@ -76,10 +75,11 @@ module.exports.startride = async (req, res, next) => {
     try {
         const ride = await rideservice.startride(rideid, otp, req.captain._id)
         await Captain.findByIdAndUpdate(req.captain._id, { status: "inactive" });
-        sendmessagetosocketid(ride.user.socketId, {
+        const userId = ride.user._id || ride.user;
+        sendmessagetosocketid(userId, {
             event: 'ridestarted',
             data: ride
-        })
+        });
         return res.status(200).json(ride)
     } catch (error) {
         return res.status(500).json({ message: error.message })
@@ -109,7 +109,8 @@ module.exports.completeride = async (req, res, next) => {
             }
         });
 
-        sendmessagetosocketid(ride.user.socketId, {
+        const userId = ride.user._id || ride.user;
+        sendmessagetosocketid(userId, {
             event: "ridecompleted",
             data: ride,
         });
@@ -124,13 +125,24 @@ module.exports.cancelRide = async (req, res) => {
 
     try {
         const ride = await rideModel.findByIdAndUpdate(rideid, { status: "cancelled" }, { new: true }).populate("captain").populate('user');
-        await captainModel.findByIdAndUpdate(ride.captain._id, { status: "active" })
         if (!ride) return res.status(404).json({ message: "Ride not found" });
 
-        sendmessagetosocketid(ride.captain.socketId, {
-            event: "ridecancelled",
-            data: ride,
-        });
+        if (ride.captain) {
+            await captainModel.findByIdAndUpdate(ride.captain._id, { status: "active" });
+            const captainId = ride.captain._id || ride.captain;
+            sendmessagetosocketid(captainId, {
+                event: "ridecancelled",
+                data: ride,
+            });
+        }
+
+        if (ride.user) {
+            const userId = ride.user._id || ride.user;
+            sendmessagetosocketid(userId, {
+                event: "ridecancelled",
+                data: ride,
+            });
+        }
 
         return res.status(200).json({ message: "Ride cancelled successfully" });
     } catch (error) {
@@ -172,6 +184,32 @@ module.exports.rateCaptain = async (req, res) => {
         });
 
         return res.status(200).json({ message: 'Rating submitted successfully' });
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports.getActiveRideUser = async (req, res) => {
+    try {
+        const activeRide = await rideModel.findOne({
+            user: req.user._id,
+            status: { $in: ['pending', 'accepted', 'ongoing'] }
+        }).populate('captain').populate('user').select('+otp');
+
+        return res.status(200).json(activeRide || null);
+    } catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports.getActiveRideCaptain = async (req, res) => {
+    try {
+        const activeRide = await rideModel.findOne({
+            captain: req.captain._id,
+            status: { $in: ['accepted', 'ongoing'] }
+        }).populate('user').populate('captain');
+
+        return res.status(200).json(activeRide || null);
     } catch (error) {
         return res.status(500).json({ message: error.message });
     }

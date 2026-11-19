@@ -27,6 +27,33 @@ const Captainhome = () => {
     }
   }, [captain]);
 
+  // Restore active accepted ride on refresh/mount
+  useEffect(() => {
+    const fetchActiveCaptainRide = async () => {
+      try {
+        const response = await axios.get(
+          `${import.meta.env.VITE_BASE_URL}/ride/active-ride-captain`,
+          { withCredentials: true }
+        );
+        if (response.data) {
+          const activeRide = response.data;
+          setride(activeRide);
+          if (activeRide.status === "accepted") {
+            // Captain accepted, waiting for OTP entry
+            setconfirmridepopup(true);
+          } else if (activeRide.status === "ongoing") {
+            // OTP already entered! Trip is actively in progress
+            navigate("/captainriding");
+          }
+        }
+      } catch (err) {
+        console.log("No active captain ride or error:", err.message);
+      }
+    };
+
+    fetchActiveCaptainRide();
+  }, []);
+
   useEffect(() => {
     if (navigator.geolocation) {
       const watchId = navigator.geolocation.watchPosition(
@@ -40,8 +67,9 @@ const Captainhome = () => {
           console.error("Geolocation error:", error);
         },
         {
-          enableHighAccuracy: true,
-          maximumAge: 0
+          enableHighAccuracy: false,
+          maximumAge: 10000,
+          timeout: 10000,
         }
       );
       return () => navigator.geolocation.clearWatch(watchId);

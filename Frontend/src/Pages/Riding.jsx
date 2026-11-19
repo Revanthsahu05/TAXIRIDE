@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +6,26 @@ import { Userdatacontext } from "../context/Usercontext";
 import RidingLivetracking from "../components/RidingLivetracking";
 const Riding = () => {
   const navigate = useNavigate();
-  const { ridedata } = useContext(Userdatacontext);
+  const { ridedata, setridedata } = useContext(Userdatacontext);
+
+  useEffect(() => {
+    if (!ridedata || !ridedata._id) {
+      axios
+        .get(`${import.meta.env.VITE_BASE_URL}/ride/active-ride`, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.data) {
+            setridedata(response.data);
+          } else {
+            navigate("/home");
+          }
+        })
+        .catch(() => {
+          navigate("/home");
+        });
+    }
+  }, [ridedata, navigate, setridedata]);
   const handleclick = async () => {
     try {
       const response = await axios.post(

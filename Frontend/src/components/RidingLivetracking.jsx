@@ -27,9 +27,9 @@ export default function RidingLivetracking() {
         console.error("Error getting user location:", error);
       },
       {
-        enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 5000,
+        enableHighAccuracy: false,
+        maximumAge: 10000,
+        timeout: 10000,
       }
     );
 

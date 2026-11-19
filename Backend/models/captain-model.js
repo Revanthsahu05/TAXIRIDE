@@ -24,9 +24,6 @@ const captainschema = mongoose.Schema({
         required: true,
         select: false
     },
-    socketId: {
-        type: String,
-    },
     status: {
         type: String,
         enum: ["active", "inactive"],

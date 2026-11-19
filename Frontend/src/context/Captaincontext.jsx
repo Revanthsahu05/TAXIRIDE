@@ -9,7 +9,6 @@ const CaptainContext = ({ children }) => {
       lastname: "",
     },
     email: "",
-    socketId: "",
     status: "",
     vechile: {
       color: "",

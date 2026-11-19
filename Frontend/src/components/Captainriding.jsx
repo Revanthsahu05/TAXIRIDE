@@ -1,16 +1,36 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useRef, useContext, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Finishride from "./Finishride";
-import { useState, useRef } from "react";
+import axios from "axios";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
-import { useContext } from "react";
 import { captaindatacontext } from "../context/Captaincontext";
 import RidingLivetracking from "./RidingLivetracking";
+
 const Captainriding = () => {
+  const navigate = useNavigate();
   const [finishridepanel, setFinishridepanel] = useState(false);
   const finishridepanelref = useRef(null);
-  const {ride,setride,captain}=useContext(captaindatacontext)
+  const { ride, setride, captain } = useContext(captaindatacontext);
+
+  useEffect(() => {
+    if (!ride || !ride._id) {
+      axios
+        .get(`${import.meta.env.VITE_BASE_URL}/ride/active-ride-captain`, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.data) {
+            setride(response.data);
+          } else {
+            navigate("/captain-home");
+          }
+        })
+        .catch(() => {
+          navigate("/captain-home");
+        });
+    }
+  }, [ride, navigate, setride]);
   useGSAP(
     function () {
       if (finishridepanel) {
